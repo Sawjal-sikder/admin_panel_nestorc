@@ -1,0 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+
+
+.logo-gradient {
+  background: linear-gradient(135deg, #ff3898, #00ff8c);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradient-shift 3s ease-in-out infinite alternate;
+}
+
+
+
+
+
+
+
+.my-main-button {
+  color: #FEFEFE;
+  background-color: #359700;
+  border: none;
+}
+
+.my-main-button:hover {
+  background-color: #236400 !important;
+  color: #fff !important;
+  border: none !important;
+}
+
+
+.my-custom-button {
+  color: #FEFEFE;
+  background-color: #359700;
+  padding: 20px;
+  font-size: 16px;
+  font-weight: bold; 
+  border: none;
+}
+
+.my-custom-button:hover {
+  background-color: #236400 !important;
+  color: #fff !important;
+  border: none !important;
+}

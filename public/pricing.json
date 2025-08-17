@@ -1,0 +1,44 @@
+[
+  {
+    "id": 1,
+    "title": "Creator",
+    "discount_price_per_month": "6.99",
+    "regular_price_per_month": "12.99",
+    "discount_price_per_year": "69.99",
+    "regular_price_per_year": "99.99",
+    "have_access_scripts_per_month": true,
+    "access_scripts_per_month": 200,
+    "full_scripts_library_access": true,
+    "downloadable_template": true,
+    "ai_screept_generator": false,
+    "is_active": true
+  },
+  {
+    "id": 2,
+    "title": "Pro Creator",
+    "discount_price_per_month": "9.99",
+    "regular_price_per_month": "19.99",
+    "discount_price_per_year": "89.99",
+    "regular_price_per_year": "149.99",
+    "have_access_scripts_per_month": true,
+    "access_scripts_per_month": 500,
+    "full_scripts_library_access": true,
+    "downloadable_template": true,
+    "ai_screept_generator": true,
+    "is_active": true
+  },
+  {
+    "id": 3,
+    "title": "Unlimited",
+    "discount_price_per_month": "14.99",
+    "regular_price_per_month": "29.99",
+    "discount_price_per_year": "149.99",
+    "regular_price_per_year": "249.99",
+    "have_access_scripts_per_month": true,
+    "access_scripts_per_month": -1,
+    "full_scripts_library_access": true,
+    "downloadable_template": true,
+    "ai_screept_generator": true,
+    "is_active": true
+  }
+]
