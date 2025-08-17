@@ -1,6 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
-import { getMockUsers } from "../api/api";
+import API from "./api";
 
+const getUsers = async (params) => {
+  const response = await API.get("/auth/users/", { params });
+  return response.data;
+};
 
 export const useAllUsers = (params) => {
   const {
@@ -11,11 +15,17 @@ export const useAllUsers = (params) => {
     refetch,
   } = useQuery({
     queryKey: ["allUsers", params],
-    queryFn: () => getMockUsers(params),
+    queryFn: () => getUsers(params),
     keepPreviousData: true,
   });
 
-  const { data: allUsers = [], pagination = {} } = response;
+  // Direct access to the data array
+  const allUsers = response || [];
+  const pagination = {
+    totalUser: response?.length || 0,
+    currentPage: params.page,
+    pageSize: params.limit,
+  };
 
   return { allUsers, pagination, isLoading, isError, error, refetch };
 };

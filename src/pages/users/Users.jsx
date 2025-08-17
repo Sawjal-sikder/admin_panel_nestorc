@@ -9,6 +9,7 @@ import {
   notification,
   Skeleton,
   Alert,
+  Input,
 } from "antd";
 import { key } from "localforage";
 import { MdBlock } from "react-icons/md";
@@ -31,6 +32,8 @@ function UsersPage() {
   const [filter, setFilter] = useState({
     page: 1,
     limit: 10,
+    search: "",
+    ordering: "-created_at"  // newest first
   });
 
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
@@ -74,12 +77,11 @@ function UsersPage() {
   const handleBlock = async (id) => {
     setBlockLoading(true);
     try {
-      console.log(id);
-      // await API.delete(`/courses/delete/${id}`);
+      await API.post(`/auth/users/${id}/block/`);
       openNotification("success", "Success", "User blocked successfully");
       refetch();
     } catch (error) {
-      openNotification("error", "Error", "Failed to block user");
+      openNotification("error", "Error", error.response?.data?.detail || "Failed to block user");
     } finally {
       setBlockLoading(false);
     }
@@ -105,42 +107,44 @@ function UsersPage() {
 
   const columns = [
     {
-      title: <span className="text-[20px] !text-center">User</span>,
-      dataIndex: "name",
-      key: "name",
+      title: <span className="text-md !text-center">User</span>,
+      dataIndex: "full_name",
+      key: "full_name",
       render: (text, record) => (
-        <Space size="middle">
-          <Avatar className="w-[40px] h-[40px]" src={record.profile} />
-          <span className=" text-[16px]">{text}</span>
+        <Space size="middle" key={record.email}>
+          <Avatar className="w-[40px] h-[40px]">{text?.[0]?.toUpperCase()}</Avatar>
+          <span className="text-sm">{text}</span>
         </Space>
       ),
     },
-
     {
-      title: <span className="text-[20px]">Email</span>,
+      title: <span className="text-md">E-mail address</span>,
       dataIndex: "email",
       key: "email",
       render: (email) => (
-        <span className=" text-[16px]">{email}</span>
+        <span className="text-sm">{email}</span>
       ),
     },
     {
-      title: <span className="text-[20px]">Status</span>,
-      key: "status",
-      render: (_, record) => (
-        <Tag
-          className="w-full mr-5 text-center text-[20px] py-3"
-          color={record.status === "active" ? "#359700" : "#FE7400B2"}
-        >
-          {record.status === "active" ? "Active" : "Inactive"}
-        </Tag>
+      title: <span className="text-md">Phone</span>,
+      dataIndex: "phone_number",
+      key: "phone_number",
+      render: (phone) => (
+        <span className="text-sm">{phone}</span>
+      ),
+    }, {
+      title: <span className="text-md">Status</span>,
+      dataIndex: "is_active",
+      key: "is_active",
+      render: (isActive) => (
+        <span className="text-sm">{isActive ? "Active" : "Inactive"}</span>
       ),
     },
     {
-      title: <span className="text-[20px]">Action</span>,
+      title: <span className="text-md">Action</span>,
       key: "action",
       render: (_, record) => (
-        <Space size="middle">
+        <Space size="middle" key={record.email}>
           <EyeOutlined
             onClick={() => handleUserDetails(record)}
             className="text-[23px] cursor-pointer"
@@ -149,7 +153,7 @@ function UsersPage() {
           <Button
             type="text"
             loading={blockLoading}
-            onClick={() => showDeleteConfirm(record.id)}
+            onClick={() => showDeleteConfirm(record.email)} // Using email instead of id
             icon={<MdBlock className="text-[23px] text-red-400 hover:text-red-300" />}
           />
         </Space>
@@ -157,12 +161,21 @@ function UsersPage() {
     },
   ];
 
+  const handleSearch = (value) => {
+    setFilter(prev => ({
+      ...prev,
+      search: value,
+      page: 1 // Reset to first page on new search
+    }));
+  };
+
   return (
-    <div className="">
+    <div className="space-y-4">
+
       <Table
         columns={columns}
         dataSource={allUsers}
-        rowKey="id"
+        rowKey="email" // Using email as the unique identifier
         pagination={{
           current: filter.page,
           pageSize: filter.limit,
