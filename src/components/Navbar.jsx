@@ -104,7 +104,9 @@ const Navbar = ({ showDrawer }) => {
         onClose={() => setDrawerVisible(false)}
         open={drawerVisible}
         width={300}
-        bodyStyle={{ padding: 0 }}
+        styles={{
+          body: { padding: 0 }
+        }}
       >
         <div className="p-4">
           <p>No new notifications</p>

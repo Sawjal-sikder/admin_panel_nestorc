@@ -146,10 +146,11 @@ function UsersPage() {
             className="text-[23px] cursor-pointer"
           />
 
-          <MdBlock
-            className="text-[23px] text-red-400 hover:text-red-300 cursor-pointer"
+          <Button
+            type="text"
             loading={blockLoading}
             onClick={() => showDeleteConfirm(record.id)}
+            icon={<MdBlock className="text-[23px] text-red-400 hover:text-red-300" />}
           />
         </Space>
       ),

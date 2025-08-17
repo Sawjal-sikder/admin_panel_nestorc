@@ -84,7 +84,7 @@ const MainLayout = () => {
           onClose={closeDrawer}
           open={drawerVisible}
           styles={{
-            body: { padding: 0 },
+            body: { padding: 0 }
           }}
         >
           <Sidebar onClick={closeDrawer} />
@@ -94,7 +94,7 @@ const MainLayout = () => {
           <Content>
             <div
               className="p-4 lg:px-12  min-h-[93vh]"
-              // style={{ background: "#FFF7EB" }}
+            // style={{ background: "#FFF7EB" }}
             >
               <div className="flex items-center gap-x-2 mb-5">
                 <ArrowLeftOutlined
@@ -104,18 +104,11 @@ const MainLayout = () => {
 
                 <Breadcrumb
                   separator={<span style={{ color: "gray" }}>/</span>}
-                  className=" text-[20px] lg:text-[32px] font-semibold"
-                >
-                  {generateBreadcrumbItems().map((item, index) => (
-                    <Breadcrumb.Item key={index}>
-                      <Link
-                        to={item.href}
-                      >
-                        {item.title}
-                      </Link>
-                    </Breadcrumb.Item>
-                  ))}
-                </Breadcrumb>
+                  className="text-[20px] lg:text-[32px] font-semibold"
+                  items={generateBreadcrumbItems().map((item) => ({
+                    title: <Link to={item.href}>{item.title}</Link>
+                  }))}
+                />
               </div>
 
               <Outlet />
@@ -123,7 +116,7 @@ const MainLayout = () => {
           </Content>
         </Layout>
       </Layout>
-  {/* <style jsx global>{`
+      {/* <style jsx global>{`
         .custom-dark-table .ant-table {
           background-color: #4f6572;
           // border: 1px solid #989898;
