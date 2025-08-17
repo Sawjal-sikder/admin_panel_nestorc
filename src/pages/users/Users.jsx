@@ -115,12 +115,7 @@ function UsersPage() {
         </Space>
       ),
     },
-    // {
-    //   title: <span className="text-[20px]">Age</span>,
-    //   dataIndex: "age",
-    //   key: "age",
-    //   render: (age) => <span className=" text-[16px]">{age}</span>,
-    // },
+
     {
       title: <span className="text-[20px]">Email</span>,
       dataIndex: "email",
@@ -129,22 +124,6 @@ function UsersPage() {
         <span className=" text-[16px]">{email}</span>
       ),
     },
-    // {
-    //   title: <span className="text-[20px]">Location</span>,
-    //   dataIndex: "location",
-    //   key: "location",
-    //   render: (location) => (
-    //     <span className=" text-[16px]">{location}</span>
-    //   ),
-    // },
-    // {
-    //   title: <span className="text-[20px]">XP Earned</span>,
-    //   dataIndex: "xp_earned",
-    //   key: "xp_earned",
-    //   render: (xp) => (
-    //     <span className=" text-[16px]">{xp.toLocaleString()}</span>
-    //   ),
-    // },
     {
       title: <span className="text-[20px]">Status</span>,
       key: "status",

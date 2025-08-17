@@ -8,31 +8,20 @@ import UsersPage from "../pages/users/Users";
 import Pricing from "../pages/pricing/Pricing";
 import TermsConditions from "../pages/termsConditions/TermsConditions";
 import PrivacyPolicy from "../pages/privacyPolicy/PrivacyPolicy";
+import ProtectedRoute from "../components/ProtectedRoute";
 
 export const router = createBrowserRouter([
   {
     path: "/login",
     element: <Login />,
   },
-  //   {
-  //     path: "/forget-password",
-  //     element: <ForgotPassword />,
-  //   },
-  //   {
-  //     path: "/check-code",
-  //     element: <CheckCode />,
-  //   },
-  //   {
-  //     path: "/set-new-password",
-  //     element: <SetNewPassword />,
-  //   },
-  //   {
-  //     path: "/password-update-login",
-  //     element: <PasswordUpdateLogin />,
-  //   },
   {
     path: "/",
-    element: <MainLayout />,
+    element: (
+      <ProtectedRoute>
+        <MainLayout />
+      </ProtectedRoute>
+    ),
     children: [
       {
         path: "/",
@@ -60,7 +49,6 @@ export const router = createBrowserRouter([
       },
     ],
   },
-
   {
     path: "*",
     element: <NotFound />,
