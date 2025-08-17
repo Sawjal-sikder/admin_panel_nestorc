@@ -15,7 +15,7 @@ const Login = () => {
     const token = localStorage.getItem("access_token");
     const user = localStorage.getItem("user");
     if (token && user) {
-      navigate("/user-management", { replace: true });
+      navigate("user-management", { replace: true });
     }
   }, [navigate]);
 
