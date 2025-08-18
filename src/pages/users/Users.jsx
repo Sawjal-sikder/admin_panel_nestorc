@@ -87,8 +87,8 @@ function UsersPage() {
     }
   };
 
-  const handleUserDetails = (userData) => {
-    setUserDetailsData(userData);
+  const handleUserDetails = (id) => {
+    setUserDetailsData(id);
     setIsViewModalOpen(true);
   };
 
@@ -146,7 +146,7 @@ function UsersPage() {
       render: (_, record) => (
         <Space size="middle" key={record.email}>
           <EyeOutlined
-            onClick={() => handleUserDetails(record)}
+            onClick={() => handleUserDetails(record.id)}
             className="text-[23px] cursor-pointer"
           />
 
@@ -191,7 +191,7 @@ function UsersPage() {
       />
 
       <UserDetailsModal
-        userDetailsData={userDetailsData}
+        id={userDetailsData}
         isOpen={isViewModalOpen}
         onClose={handleModalClose}
       />
