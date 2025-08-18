@@ -113,7 +113,7 @@ function UsersPage() {
 
   const columns = [
     {
-      title: <span className="text-md !text-center">User</span>,
+      title: <span className="text-md !text-center">Full Name</span>,
       dataIndex: "full_name",
       key: "full_name",
       render: (text, record) => (
@@ -174,10 +174,62 @@ function UsersPage() {
       page: 1 // Reset to first page on new search
     }));
   };
+  const DownloadPdf = async () => {
+    try {
+      const response = await API.get('/auth/users/download/pdf/', {
+        params: filter,
+        responseType: 'blob', // Ensure the response is treated as a blob
+      });
+
+      // Create a URL for the blob and trigger download
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'users_list.pdf'); // Set the file name
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error("Error downloading PDF:", error);
+      openNotification("error", "Download Failed", "Failed to download user list PDF.");
+    }
+  };
+
+  const DownloadExcel = async () => {
+    try {
+      const response = await API.get('/auth/users/download/excel/', {
+        params: filter,
+        responseType: 'blob', // Ensure the response is treated as a blob
+      });
+
+      // Create a URL for the blob and trigger download
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'users_list.xlsx'); // Set the file name
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error("Error downloading Excel:", error);
+      openNotification("error", "Download Failed", "Failed to download user list Excel.");
+    }
+  };
+
 
   return (
     <div className="space-y-4">
-
+      <div className="flex justify-between items-center">
+        <h2 className="text-lg font-semibold">Users List</h2>
+        <div className="flex gap-3">
+          <Button type="primary" className="bg-red-600" onClick={() => DownloadPdf()}>
+            Download user list pdf
+          </Button>
+          <Button type="primary" className="bg-[#107c41]" onClick={() => DownloadExcel()}>
+            Download user list excel
+          </Button>
+        </div>
+      </div>
       <Table
         columns={columns}
         dataSource={allUsers}
