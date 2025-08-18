@@ -16,7 +16,8 @@ const Navbar = ({ showDrawer }) => {
   const [drawerVisible, setDrawerVisible] = useState(false);
 
   const handleSignOut = () => {
-    // signOutAdmin();
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("user");
     navigate("/login");
   };
 

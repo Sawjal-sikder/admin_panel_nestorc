@@ -153,11 +153,12 @@ function UsersPage() {
         <Space size="middle" key={record.email}>
           <EyeOutlined
             onClick={() => handleUserDetails(record.id)}
-            className="text-[23px] cursor-pointer"
+            className="text-[23px] cursor-pointer text-green-300"
           />
 
           <Button
             type="text"
+            className="text-red-600"
             loading={blockLoading}
             onClick={() => handleToggleActive(record.id, record.is_active)} // Using email instead of id
             icon={<MdBlock className="text-[23px] text-red-400 hover:text-red-300" />}

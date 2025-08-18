@@ -32,7 +32,7 @@ const Login = () => {
       login(res.data.user);
 
       message.success("Login successful!");
-      navigate("/user-management", { replace: true });
+      navigate("/", { replace: true });
     } catch (error) {
       message.error(error.response?.data?.detail || "Login failed");
     } finally {
