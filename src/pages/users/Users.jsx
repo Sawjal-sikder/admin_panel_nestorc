@@ -1,30 +1,14 @@
 import { useState } from "react";
-import {
-  Table,
-  Tag,
-  Space,
-  Avatar,
-  Button,
-  Modal,
-  notification,
-  Skeleton,
-  Alert,
-  Input,
-} from "antd";
+import { Table, Space, Avatar, Button, Modal, notification, } from "antd";
 import { key } from "localforage";
 import { MdBlock } from "react-icons/md";
 import UserDetailsModal from "./UserDetailsModal";
 
-import {
-  EyeOutlined,
-  EditOutlined,
-  DeleteOutlined,
-  ExclamationCircleOutlined,
-  ReloadOutlined,
-} from "@ant-design/icons";
+import { EyeOutlined, ExclamationCircleOutlined, } from "@ant-design/icons";
 import IsLoading from "../../components/IsLoading";
 import IsError from "../../components/IsError";
 import { useAllUsers } from "../../services/usersServices";
+import API from "../../services/api.jsx";
 
 const { confirm } = Modal;
 
@@ -48,6 +32,7 @@ function UsersPage() {
   }
 
   if (isError) {
+    console.error(error);
     return <IsError error={error} refetch={refetch} />;
   }
 
@@ -60,16 +45,37 @@ function UsersPage() {
     });
   };
 
-  const showDeleteConfirm = (id) => {
+  const handleToggleActive = async (id, currentStatus) => {
+    const action = currentStatus ? "Deactivate" : "Activate";
     confirm({
-      title: "Are you sure you want to Block this user?",
+      title: `Are you sure you want to ${action} this user?`,
       icon: <ExclamationCircleOutlined />,
-      content: "Do you want to Block this user?",
-      okText: "Yes, Block",
-      okType: "danger",
+      content: `Do you want to ${action} this user?`,
+      okText: `Yes, ${action}`,
+      okType: currentStatus ? "danger" : "primary",
       cancelText: "Cancel",
-      onOk() {
-        handleBlock(id);
+      onOk: async () => {
+
+        try {
+          const response = await API.patch(`/auth/users/activate/${id}/`, {
+            is_active: !currentStatus,
+          });
+          notification.success({
+            message: "Success",
+            description: `User ${action.toLowerCase()}d successfully`,
+            placement: "topRight",
+            duration: 3,
+          });
+          refetch();
+        } catch (error) {
+          notification.error({
+            message: "Error",
+            description: error.response?.data?.detail || `Failed to ${action.toLowerCase()} user`,
+            placement: "topRight",
+            duration: 3,
+          });
+        }
+
       },
     });
   };
@@ -153,7 +159,7 @@ function UsersPage() {
           <Button
             type="text"
             loading={blockLoading}
-            onClick={() => showDeleteConfirm(record.email)} // Using email instead of id
+            onClick={() => handleToggleActive(record.id, record.is_active)} // Using email instead of id
             icon={<MdBlock className="text-[23px] text-red-400 hover:text-red-300" />}
           />
         </Space>
