@@ -15,6 +15,10 @@ const Navbar = ({ showDrawer }) => {
 
   const [drawerVisible, setDrawerVisible] = useState(false);
 
+  const handleOnClicktoHome = () => {
+    navigate("/");
+  };
+
   const handleSignOut = () => {
     localStorage.removeItem("access_token");
     localStorage.removeItem("user");
@@ -57,7 +61,7 @@ const Navbar = ({ showDrawer }) => {
             />
 
             <button
-              // onClick={hinddleOnClick}
+              onClick={handleOnClicktoHome}
               className="flex items-center space-x-1 lg:space-x-2 xl:space-x-3 logo-container cursor-pointer lg:mr-4"
             >
               {/* Header Logo */}
