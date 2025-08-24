@@ -1,24 +1,28 @@
-import React, { useState, useEffect } from "react"; // ✅ include useEffect
+import React, { useState, useEffect } from "react"; // 
 import { Form, Input, Button, message } from "antd";
 import API from "../../services/api";
 
-function EditProfile() {
+function EditProfile({ userDataMain }) {
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await API.get("/auth/users/update/"); // or /update/ if API returns current user
+        const response = await API.get("/auth/users/update/");
         const userData = response.data;
+        // console.log("Fetched user data:", userData);
 
         form.setFieldsValue({
           user_name: userData.full_name || "",
           email: userData.email || "",
           contact_no: userData.phone_number || "",
+
         });
+        // full_name and profile_image
+        userDataMain(userData.full_name || "", userData.profile_image || "", userData.email || "", userData.phone_number || "");
       } catch (error) {
-        console.error("Failed to fetch user data:", error);
+        // console.error("Failed to fetch user data:", error);
       }
     };
 
@@ -32,15 +36,21 @@ function EditProfile() {
         full_name: values.user_name,
         email: values.email,
         phone_number: values.contact_no,
-        is_active: true, // include if API requires
+        is_active: true,
       };
 
-      const response = await API.put("/auth/users/update/", payload);
+      const response = await API.patch("/auth/users/update/", payload, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          "Authorization": `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+
       message.success("Profile updated successfully.");
-      console.log("Updated:", response.data);
+      // console.log("Updated:", response.data);
     } catch (error) {
-      console.error(error.response?.data || error);
-      message.error("❌ Failed to update profile.");
+      // console.error(error.response?.data || error);
+      message.error("Failed to update profile.");
     } finally {
       setLoading(false);
     }

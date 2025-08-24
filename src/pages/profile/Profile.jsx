@@ -1,15 +1,17 @@
 import React, { useRef, useState } from "react";
-import { Avatar, Tabs } from "antd";
+import { Avatar, Tabs, message } from "antd";
 import { EditOutlined } from "@ant-design/icons";
 import { MdLockReset } from "react-icons/md";
 import { FaUserEdit } from "react-icons/fa";
 import { FiCamera } from "react-icons/fi";
 import EditProfile from "./EditProfile";
 import ChangePassword from "./ChangePassword";
+import API from "../../services/api";
 
 const { TabPane } = Tabs;
 
 function Profile() {
+  const [data, setData] = useState({ name: "", image: "", email: "", phone_number: "" });
   const fileInputRef = useRef(null);
   const [avatarUrl, setAvatarUrl] = useState(
     "https://cdn-icons-png.flaticon.com/512/6522/6522516.png"
@@ -19,12 +21,34 @@ function Profile() {
     fileInputRef.current.click();
   };
 
-  const handleFileChange = (event) => {
+  const handleFileChange = async (event) => {
     const file = event.target.files[0];
-    if (file) {
-      const url = URL.createObjectURL(file);
-      setAvatarUrl(url);
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("profile_image", file);
+
+    try {
+      const response = await API.patch("/auth/users/update/", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          "Authorization": `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+
+      setData((prev) => ({
+        ...prev,
+        image: response.data.profile_image, // update avatar URL
+      }));
+
+      message.success("Profile picture updated successfully!");
+    } catch (error) {
+      console.error(error.response?.data || error);
+      message.error("Failed to update profile picture.");
     }
+  };
+  const handleNameImageChange = (newName, newImage, newEmail, newPhoneNumber) => {
+    setData({ name: newName, image: newImage, email: newEmail, phone_number: newPhoneNumber });
   };
 
   return (
@@ -34,7 +58,7 @@ function Profile() {
         <div className="relative w-[120px] h-[120px] mx-auto">
           <Avatar
             className="w-full h-full border-white border-[1px]"
-            src={<img src={avatarUrl} alt="avatar" />}
+            src={<img src={data.image} alt="avatar" />}
           />
           {/* Camera Icon */}
           <div
@@ -55,39 +79,37 @@ function Profile() {
         </div>
 
         <h2 className="text-[30px] font-semibold  mt-4">
-          Shah Rukh Khan
+          {data.name || "User Name"}
         </h2>
 
         {/* Tabs */}
-        <Tabs defaultActiveKey="1" className="custom-tabs mb-6 mt-4">
-          <TabPane
-            tab={
-              <span className="flex items-center gap-2">
-                <FaUserEdit />
-                <span>Edit Profile</span>
-              </span>
-            }
-            key="1"
-          >
-            <EditProfile />
-          </TabPane>
-
-          <TabPane
-            tab={
-              <span className="flex items-center gap-2">
-                <MdLockReset />
-                <span>Change Password</span>
-              </span>
-            }
-            key="2"
-          >
-            <ChangePassword />
-          </TabPane>
-        </Tabs>
+        <Tabs
+          defaultActiveKey="1"
+          items={[
+            {
+              key: "1",
+              label: (
+                <span className="flex items-center gap-2">
+                  <FaUserEdit /> Edit Profile
+                </span>
+              ),
+              children: <EditProfile userDataMain={handleNameImageChange} />,
+            },
+            {
+              key: "2",
+              label: (
+                <span className="flex items-center gap-2">
+                  <MdLockReset /> Change Password
+                </span>
+              ),
+              children: <ChangePassword />,
+            },
+          ]}
+        />
       </div>
 
 
-      <style jsx global>{`
+      <style >{`
         .custom-tabs .ant-tabs-tab {
           font-size: 16px;
           padding: 12px 16px;
