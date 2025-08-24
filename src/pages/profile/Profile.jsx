@@ -12,7 +12,7 @@ const { TabPane } = Tabs;
 function Profile() {
   const fileInputRef = useRef(null);
   const [avatarUrl, setAvatarUrl] = useState(
-    "https://images.news18.com/ibnlive/uploads/2021/08/shah-rukh-khan-01-16300515664x3.jpg"
+    "https://cdn-icons-png.flaticon.com/512/6522/6522516.png"
   );
 
   const handleAvatarClick = () => {
@@ -86,7 +86,7 @@ function Profile() {
         </Tabs>
       </div>
 
-      
+
       <style jsx global>{`
         .custom-tabs .ant-tabs-tab {
           font-size: 16px;
