@@ -46,7 +46,7 @@ const TableColumn = ({ handleUserDetails, blockLoading, handleToggleActive }) =>
                               <Button
                                     type="text"
                                     loading={blockLoading}
-                                    onClick={() => handleToggleActive && handleToggleActive(record.id)}
+                                    onClick={() => handleToggleActive(record.id)}
                                     icon={<MdBlock className="text-[23px] text-red-600" />}
                               />
                         </Space>
