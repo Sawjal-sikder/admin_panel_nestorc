@@ -49,32 +49,32 @@ const Sidebar = ({ onClick }) => {
       label: <Link to="/user-management">User Management</Link>,
     },
     {
-      key: "pricing",
+      key: "services",
       icon: <TbPackages />,
-      label: <Link to="/pricing">Pricing</Link>,
+      label: <Link to="/services">Services</Link>,
     },
-     {
-      key: "settings",
-      icon: <SettingOutlined />,
-      label: "Settings",
-      className: "custom-submenu ", // Add this
-      popupClassName: "custom-submenu-popup bg-red-500", // Add this
-      children: [
-        {
-          key: "setting-profile",
-          label: <Link to="/profile">Profile</Link>,
-        },
-        {
-          key: "terms-conditions",
-          label: <Link to="/terms-conditions">Terms & Conditions</Link>,
-        },
-        {
-          key: "privacy-policy",
-          label: <Link to="/privacy-policy">Privacy Policy</Link>,
-        },
-      ],
-    },
- 
+    // {
+    //   key: "settings",
+    //   icon: <SettingOutlined />,
+    //   label: "Settings",
+    //   className: "custom-submenu ", // Add this
+    //   popupClassName: "custom-submenu-popup bg-red-500", // Add this
+    //   children: [
+    //     {
+    //       key: "setting-profile",
+    //       label: <Link to="/profile">Profile</Link>,
+    //     },
+    //     {
+    //       key: "terms-conditions",
+    //       label: <Link to="/terms-conditions">Terms & Conditions</Link>,
+    //     },
+    //     {
+    //       key: "privacy-policy",
+    //       label: <Link to="/privacy-policy">Privacy Policy</Link>,
+    //     },
+    //   ],
+    // },
+
     // Add logout as a menu item at the bottom
     {
       key: "logout",
@@ -107,7 +107,7 @@ const Sidebar = ({ onClick }) => {
           backgroundColor: "#ffffff",
           color: "#002436",
         }}
-        // theme="dark"
+      // theme="dark"
       />
     </div>
   );

@@ -153,7 +153,7 @@ function UsersPage() {
         <Space size="middle" key={record.email}>
           <EyeOutlined
             onClick={() => handleUserDetails(record.id)}
-            className="text-[23px] cursor-pointer text-green-300"
+            className="text-[23px] cursor-pointer text-black-300"
           />
 
           <Button

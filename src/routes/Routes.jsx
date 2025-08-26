@@ -8,7 +8,7 @@ import NotFound from "../pages/NotFound";
 const baseUrl = import.meta.env.BASE_URL;
 import Profile from "../pages/profile/Profile";
 import UsersPage from "../pages/users/Users";
-import Pricing from "../pages/pricing/Pricing";
+import Services from "../pages/users/services";
 import TermsConditions from "../pages/termsConditions/TermsConditions";
 import PrivacyPolicy from "../pages/privacyPolicy/PrivacyPolicy";
 import ProtectedRoute from "../components/ProtectedRoute";
@@ -36,8 +36,8 @@ export const router = createBrowserRouter(
           element: <UsersPage />,
         },
         {
-          path: "pricing",
-          element: <Pricing />,
+          path: "services",
+          element: <Services />,
         },
         {
           path: "profile",
