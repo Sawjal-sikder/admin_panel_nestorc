@@ -7,7 +7,7 @@ import CreateVenue from "./serviceeHook/createVenue";
 import useDelete from "../../hook/delete";
 
 const MainComponent = () => {
-  const { data: initialData, loading, error } = servicedataHook();
+  const { data: initialData, loading, error, refetch } = servicedataHook();
   const { handleDelete, loading: deleteLoading, error: deleteError, success: deleteSuccess } = useDelete("/services/venues");
 
   const [data, setData] = useState([]);
@@ -33,18 +33,13 @@ const MainComponent = () => {
 
     try {
       await handleDelete(id);
-
-      // Remove the deleted item from local state
       setData((prevData) => prevData.filter(item => item.id !== id));
-
-      // Remove loading state
       setLoadingItems((prev) => {
         const newSet = new Set(prev);
         newSet.delete(id);
         return newSet;
       });
     } catch (error) {
-      // Remove loading state on error
       setLoadingItems((prev) => {
         const newSet = new Set(prev);
         newSet.delete(id);
@@ -55,6 +50,20 @@ const MainComponent = () => {
 
   const handleCreate = () => {
     setIsModalOpenCreateVenue(true);
+  };
+
+  // Callback to refresh data after venue creation
+  const handleVenueCreated = (newVenue) => {
+    // Add the new venue to the existing data
+    if (newVenue) {
+      setData((prevData) => [...prevData, newVenue]);
+    } else {
+      // Fallback: if no venue data is passed, try refetch
+      if (typeof refetch === 'function') {
+        refetch();
+      }
+    }
+    setIsModalOpenCreateVenue(false); // Close the modal
   };
 
   if (loading) return <div>Loading...</div>;
@@ -91,9 +100,10 @@ const MainComponent = () => {
         title="Create Venue"
         open={isModalOpenCreateVenue}
         onCancel={() => setIsModalOpenCreateVenue(false)}
-        footer={null} // no default footer
+        footer={null}
+        destroyOnHidden={true}  // Updated from destroyOnClose
       >
-        <CreateVenue />
+        <CreateVenue onSuccess={handleVenueCreated} />
       </Modal>
     </>
   );

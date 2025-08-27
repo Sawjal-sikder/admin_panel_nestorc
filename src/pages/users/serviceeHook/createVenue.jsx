@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, DatePicker, Form, Input, Select, Spin, Upload } from "antd";
+import { Button, DatePicker, Form, Input, Select, Spin, Upload, message } from "antd";
 import ImgCrop from "antd-img-crop";
 import useFetchData from "./select/selectHook";
 import API from "../../../services/api";
@@ -11,10 +11,11 @@ const formItemLayout = {
       wrapperCol: { xs: { span: 24 }, sm: { span: 14 } },
 };
 
-const CreateVenue = () => {
+const CreateVenue = ({ onSuccess }) => {
       const [form] = Form.useForm();
+      const [loading, setLoading] = useState(false);
       const variant = Form.useWatch("variant", form);
-      const { data: cities, loading } = useFetchData("/services/cities/");
+      const { data: cities, loading: citiesLoading } = useFetchData("/services/cities/");
       const { data: places, loading: placesLoading } = useFetchData("/services/places/");
 
       // Single image state
@@ -40,38 +41,49 @@ const CreateVenue = () => {
       };
 
       const handleSubmit = async (values) => {
-            const [latitude, longitude] = values["latitude&longitude"]
-                  .split(",")
-                  .map((v) => parseFloat(v.trim()));
-
-            const formData = new FormData();
-            formData.append("venue_name", values.venue_name);
-            formData.append("latitude", latitude);
-            formData.append("longitude", longitude);
-            formData.append("description", values.description);
-            formData.append("city", Number(values.city));
-            formData.append("type_of_place", Number(values.place));
-
-            if (fileList[0]?.originFileObj) {
-                  formData.append("image", fileList[0].originFileObj);
-            }
+            setLoading(true);
 
             try {
-                  // no headers set
+                  const [latitude, longitude] = values["latitude&longitude"]
+                        .split(",")
+                        .map((v) => parseFloat(v.trim()));
+
+                  const formData = new FormData();
+                  formData.append("venue_name", values.venue_name);
+                  formData.append("latitude", latitude);
+                  formData.append("longitude", longitude);
+                  formData.append("description", values.description);
+                  formData.append("city", Number(values.city));
+                  formData.append("type_of_place", Number(values.place));
+
+                  if (fileList[0]?.originFileObj) {
+                        formData.append("image", fileList[0].originFileObj);
+                  }
+
                   const res = await API.post("/services/venues/create/", formData, {
                         headers: {
                               "Content-Type": "multipart/form-data",
                         },
                   });
-                  console.log("Response:", res.data);
+
+                  // console.log("Response:", res.data);
+                  message.success("Venue created successfully!");
 
                   // Reset form fields
                   form.resetFields();
-
                   // Clear image upload
                   setFileList([]);
+
+                  // Call the success callback with the newly created venue data
+                  if (onSuccess) {
+                        onSuccess(res.data); // Pass the created venue data
+                  }
+
             } catch (err) {
                   console.error(err.response?.data || err);
+                  message.error("Failed to create venue. Please try again.");
+            } finally {
+                  setLoading(false);
             }
       };
 
@@ -122,8 +134,8 @@ const CreateVenue = () => {
                         <Select
                               placeholder="Select a city"
                               allowClear
-                              loading={loading}
-                              disabled={loading}
+                              loading={citiesLoading}
+                              disabled={citiesLoading}
                               options={cities.map((city) => ({ label: city.name, value: city.id }))}
                         />
                   </Form.Item>
@@ -172,8 +184,8 @@ const CreateVenue = () => {
 
                   {/* Submit */}
                   <Form.Item wrapperCol={{ offset: 6, span: 16 }}>
-                        <Button type="primary" htmlType="submit">
-                              Submit
+                        <Button type="primary" htmlType="submit" loading={loading}>
+                              {loading ? "Creating..." : "Submit"}
                         </Button>
                   </Form.Item>
             </Form>
