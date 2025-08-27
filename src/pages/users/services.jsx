@@ -57,13 +57,7 @@ const MainComponent = () => {
 
   // Callback to refresh data after venue creation
   const handleVenueCreated = (newVenue) => {
-    // Optimistically add the new venue to local state
-    if (newVenue) {
-      setData((prevData) => [...prevData, newVenue]);
-      message.success("Venue created successfully!");
-    }
-
-    setIsModalOpenCreateVenue(false);
+    window.location.reload();
   };
 
   if (loading) return <div>Loading...</div>;
