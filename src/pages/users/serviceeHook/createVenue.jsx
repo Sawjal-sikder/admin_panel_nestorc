@@ -66,15 +66,12 @@ const CreateVenue = ({ onSuccess }) => {
                         },
                   });
 
-                  // console.log("Response:", res.data);
-                  message.success("Venue created successfully!");
-
                   // Reset form fields
                   form.resetFields();
                   // Clear image upload
                   setFileList([]);
 
-                  // Call the success callback with the newly created venue data
+                  // Call the success callback with the created venue data
                   if (onSuccess) {
                         onSuccess(res.data); // Pass the created venue data
                   }

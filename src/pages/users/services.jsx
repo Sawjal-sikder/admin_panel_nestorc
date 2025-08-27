@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Table, Modal } from "antd";
+import { Table, Modal, message } from "antd";
 import servicedataHook from "./serviceeHook/servicedataHook";
 import TableColumn from "./serviceeHook/TableColumn/servicecolumn";
 import DetailsModal from "./serviceDetails";
@@ -52,18 +52,18 @@ const MainComponent = () => {
     setIsModalOpenCreateVenue(true);
   };
 
+  // State to trigger refetch after venue creation
+  const [venueCreated, setVenueCreated] = useState(false);
+
   // Callback to refresh data after venue creation
   const handleVenueCreated = (newVenue) => {
-    // Add the new venue to the existing data
+    // Optimistically add the new venue to local state
     if (newVenue) {
       setData((prevData) => [...prevData, newVenue]);
-    } else {
-      // Fallback: if no venue data is passed, try refetch
-      if (typeof refetch === 'function') {
-        refetch();
-      }
+      message.success("Venue created successfully!");
     }
-    setIsModalOpenCreateVenue(false); // Close the modal
+
+    setIsModalOpenCreateVenue(false);
   };
 
   if (loading) return <div>Loading...</div>;
