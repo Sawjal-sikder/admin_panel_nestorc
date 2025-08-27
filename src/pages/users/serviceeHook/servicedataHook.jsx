@@ -1,27 +1,28 @@
-import React, { useEffect, useState } from 'react'
-import API from '../../../services/api'
+import { useEffect, useState, useCallback } from "react";
+import API from "../../../services/api";
 
-const servicedataHook = () => {
+const useServiceData = () => {
       const [data, setData] = useState([]);
       const [loading, setLoading] = useState(true);
       const [error, setError] = useState(null);
 
-      useEffect(() => {
-            const fetchdata = async () => {
-                  try {
-                        const response = await API.get("/services/venues/");
-                        setData(response.data);
-                  } catch (err) {
-                        setError(err);
-                  } finally {
-                        setLoading(false);
-                  }
-            };
-
-            fetchdata();
+      const fetchData = useCallback(async () => {
+            setLoading(true);
+            try {
+                  const response = await API.get("/services/venues/");
+                  setData(response.data);
+            } catch (err) {
+                  setError(err);
+            } finally {
+                  setLoading(false);
+            }
       }, []);
 
-      return { data, loading, error };
+      useEffect(() => {
+            fetchData();
+      }, [fetchData]);
+
+      return { data, loading, error, refresh: fetchData };
 };
 
-export default servicedataHook
+export default useServiceData;

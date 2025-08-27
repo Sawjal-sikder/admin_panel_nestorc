@@ -3,7 +3,7 @@ import { Space, Button } from "antd";
 import { EyeOutlined } from "@ant-design/icons";
 import { MdBlock } from "react-icons/md";
 
-const TableColumn = ({ handleUserDetails, blockLoading, handleToggleActive }) => {
+const TableColumn = ({ handleUserDetails, blockLoading, handleToggleActive, loadingItems }) => {
       return [
             {
                   title: "Venue name",
@@ -45,7 +45,7 @@ const TableColumn = ({ handleUserDetails, blockLoading, handleToggleActive }) =>
                               />
                               <Button
                                     type="text"
-                                    loading={blockLoading}
+                                    loading={loadingItems.has(record.id)}
                                     onClick={() => handleToggleActive(record.id)}
                                     icon={<MdBlock className="text-[23px] text-red-600" />}
                               />

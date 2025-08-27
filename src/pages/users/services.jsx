@@ -1,27 +1,56 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Table, Modal } from "antd";
 import servicedataHook from "./serviceeHook/servicedataHook";
 import TableColumn from "./serviceeHook/TableColumn/servicecolumn";
 import DetailsModal from "./serviceDetails";
 import CreateVenue from "./serviceeHook/createVenue";
+import useDelete from "../../hook/delete";
 
 const MainComponent = () => {
-  const { data, loading, error } = servicedataHook();
+  const { data: initialData, loading, error } = servicedataHook();
+  const { handleDelete, loading: deleteLoading, error: deleteError, success: deleteSuccess } = useDelete("/services/venues");
 
+  const [data, setData] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalOpenCreateVenue, setIsModalOpenCreateVenue] = useState(false);
   const [selectedData, setSelectedData] = useState(null);
-  const [blockLoading, setBlockLoading] = useState(false);
+  const [loadingItems, setLoadingItems] = useState(new Set());
+
+  // Update local data when initial data changes
+  useEffect(() => {
+    if (initialData) {
+      setData(initialData);
+    }
+  }, [initialData]);
 
   const handleUserDetails = (record) => {
     setSelectedData(record);
     setIsModalOpen(true);
   };
 
-  const handleToggleActive = (id) => {
-    setBlockLoading(true);
-    // call API or handle toggle logic
-    setTimeout(() => setBlockLoading(false), 1000);
+  const handleToggleActive = async (id) => {
+    setLoadingItems((prev) => new Set(prev).add(id));
+
+    try {
+      await handleDelete(id);
+
+      // Remove the deleted item from local state
+      setData((prevData) => prevData.filter(item => item.id !== id));
+
+      // Remove loading state
+      setLoadingItems((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(id);
+        return newSet;
+      });
+    } catch (error) {
+      // Remove loading state on error
+      setLoadingItems((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(id);
+        return newSet;
+      });
+    }
   };
 
   const handleCreate = () => {
@@ -43,7 +72,7 @@ const MainComponent = () => {
       </div>
 
       <Table
-        columns={TableColumn({ handleUserDetails, blockLoading, handleToggleActive })}
+        columns={TableColumn({ handleUserDetails, loadingItems, handleToggleActive })}
         dataSource={data}
         rowKey="id"
         bordered
