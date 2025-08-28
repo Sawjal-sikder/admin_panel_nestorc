@@ -30,9 +30,9 @@ const Sidebar = ({ onClick }) => {
     const path = location.pathname;
     if (path === "/") return ["dashboard"];
     if (path === "/user-management") return ["users"];
-    if (path === "/pricing") return ["pricing"];
+    if (path === "/venue") return ["venue"];
     if (path === "/profile") return ["settings", "setting-profile"];
-    if (path === "/terms-conditions") return ["settings", "terms-conditions"];
+    if (path === "/city") return ["settings", "city"];
     if (path === "/privacy-policy") return ["settings", "privacy-policy"];
     return ["dashboard"];
   };
@@ -49,9 +49,9 @@ const Sidebar = ({ onClick }) => {
       label: <Link to="/user-management">User Management</Link>,
     },
     {
-      key: "services",
+      key: "venue",
       icon: <TbPackages />,
-      label: <Link to="/services">Services</Link>,
+      label: <Link to="/venue">Venue</Link>,
     },
     {
       key: "city",

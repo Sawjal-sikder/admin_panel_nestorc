@@ -1,48 +1,73 @@
 import React, { useState, useEffect } from "react";
-import useApiMutation from "../../hook/Create";
+import useUpdate from "../../hook/update";
 
-const CreateCityModal = ({ isOpen, onClose, onCityCreated }) => {
-      const { createData, loading, error, success } = useApiMutation("/services/cities/");
+const UpdateCityModal = ({ isOpen, onClose, onCityUpdated, city }) => {
+      const { data, loading, error, updateData } = useUpdate("/services/cities/");
       const [formData, setFormData] = useState({
             name: "",
             description: "",
       });
 
-      // Reset form and success message when modal opens
+
       useEffect(() => {
-            if (isOpen) {
-                  setFormData({ name: "", description: "" });
+            if (city && city.id) {
+                  // console.log("Setting form data for city:", city);
+                  setFormData({
+                        name: city.name || "",
+                        description: city.description || "",
+                  });
             }
-      }, [isOpen]);
+      }, [city]);
 
-      if (!isOpen) return null;
-
+      // Handle form input changes
       const handleChange = (e) => {
-            setFormData({ ...formData, [e.target.name]: e.target.value });
+            const { name, value } = e.target;
+            setFormData(prev => ({
+                  ...prev,
+                  [name]: value
+            }));
       };
 
       const handleSubmit = async (e) => {
             e.preventDefault();
+
+            // Check if city and city.id exist
+            if (!city || !city.id) {
+                  // console.error("City or city.id is missing:", city);
+                  alert("Error: City data is missing. Please try again.");
+                  return;
+            }
+
+            // console.log("Submitting update for city ID:", city.id);
+            // console.log("Form data:", formData);
+
             try {
-                  const data = await createData(formData); // Call the hook
-                  console.log("Created City:", data);
-                  onClose(); // close modal after successful creation
-                  if (onCityCreated) onCityCreated(data);
+                  const updated = await updateData(`/services/cities/${city.id}/`, formData);
+                  // console.log("Updated data:", updated);
+                  onCityUpdated(updated);
+                  onClose();
             } catch (err) {
-                  console.error("Error creating city:", err);
+                  // console.error("Update error:", err);
+                  alert("Failed to update city. Please try again.");
             }
       };
+
+      // Don't render if modal is not open
+      if (!isOpen) return null;
 
       return (
             <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
                   {/* Modal box */}
                   <div className="bg-white rounded-lg shadow-lg w-full max-w-lg p-6">
-                        <h2 className="text-2xl text-center text-gray-600 font-semibold mb-6">Create City</h2>
+                        <h2 className="text-2xl text-center text-gray-600 font-semibold mb-6">
+                              Update City
+                        </h2>
+
+
 
                         {/* Feedback messages */}
-                        {loading && <p className="text-blue-600 mb-2">Creating city...</p>}
+                        {loading && <p className="text-blue-600 mb-2">Updating city...</p>}
                         {error && <p className="text-red-600 mb-2">{JSON.stringify(error)}</p>}
-                        {success && <p className="text-green-600 mb-2">City created successfully!</p>}
 
                         {/* Form */}
                         <form onSubmit={handleSubmit} className="space-y-5">
@@ -82,10 +107,10 @@ const CreateCityModal = ({ isOpen, onClose, onCityCreated }) => {
                                     </button>
                                     <button
                                           type="submit"
-                                          disabled={loading}
-                                          className={`px-4 py-2 text-white rounded ${loading ? "bg-blue-400" : "bg-blue-600 hover:bg-blue-700"}`}
+                                          disabled={loading || !city?.id}
+                                          className={`px-4 py-2 text-white rounded ${loading || !city?.id ? "bg-blue-400" : "bg-blue-600 hover:bg-blue-700"}`}
                                     >
-                                          {loading ? "Saving..." : "Save"}
+                                          {loading ? "Updating..." : "Update"}
                                     </button>
                               </div>
                         </form>
@@ -94,4 +119,4 @@ const CreateCityModal = ({ isOpen, onClose, onCityCreated }) => {
       );
 };
 
-export default CreateCityModal;
+export default UpdateCityModal;

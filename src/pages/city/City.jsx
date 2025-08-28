@@ -1,17 +1,69 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import useFetch from "../../hook/getData";
 import { FaEdit, FaTrash } from "react-icons/fa";
-import CreateCity from "./CreateCityModal";
 import CreateCityModal from "./CreateCityModal";
+import useDelete from "../../hook/delete";
+import UpdateCityModal from "./UpdateCityModal";
 
 const City = () => {
 
   const [createCityModal, setCreateCityModal] = useState(false);
+  const [citiesData, setCitiesData] = useState([]);
+  const [updateCityModal, setUpdateCityModal] = useState(false);
+  const [selectedCity, setSelectedCity] = useState(null);
 
   const { data: cities, loading, error } = useFetch("/services/cities/");
+  const { handleDelete, loading: deleteLoading, error: deleteError, success: deleteSuccess } = useDelete("/services/cities");
+
+  // Initialize local state when fetched
+  useEffect(() => {
+    if (cities) setCitiesData(cities);
+  }, [cities]);
+
+  // Watch for delete success and update UI accordingly
+  useEffect(() => {
+    if (deleteSuccess) {
+      // Refetch data or handle success
+      // console.log("Delete operation completed successfully");
+    }
+  }, [deleteSuccess]);
+
+  // Callback when a new city is created
+  const handleCityCreated = (newCity) => {
+    setCitiesData((prev) => [...prev, newCity]);
+    setCreateCityModal(false);
+  };
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p className="text-red-500">{error}</p>;
+
+  const handleDeleteCity = async (cityId) => {
+    // confirm delete for windows
+    const confirmed = window.confirm("Are you sure you want to delete this city?");
+    if (!confirmed) return;
+
+    try {
+      await handleDelete(cityId);
+      // Remove from local state immediately after API call
+      setCitiesData((prev) => prev.filter((city) => city.id !== cityId));
+    } catch (error) {
+      // console.error("Failed to delete city:", error);
+      alert("Failed to delete city. Please try again.");
+    }
+  };
+
+  const handleCityUpdated = (updatedCity) => {
+    setCitiesData((prev) =>
+      prev.map((city) => (city.id === updatedCity.id ? updatedCity : city))
+    );
+    setUpdateCityModal(false);
+  };
+
+  const handleEdit = (city) => {
+    // console.log("Editing city:", city); // Add this debug line
+    setSelectedCity(city);
+    setUpdateCityModal(true);
+  };
 
   return (
     <div className="p-6">
@@ -38,7 +90,7 @@ const City = () => {
             </tr>
           </thead>
           <tbody>
-            {cities?.map((city, index) => (
+            {citiesData?.map((city, index) => (
               <tr
                 key={city.id}
                 className="hover:bg-gray-50 transition-colors"
@@ -48,12 +100,15 @@ const City = () => {
                 <td className="px-4 py-5 border-l border-b">{city.description}</td>
                 <td className="px-4 py-5 border-l border-b flex gap-5 justify-center">
                   {/* Edit button */}
-                  <button className="text-blue-500 hover:underline flex items-center gap-1">
+                  <button
+                    className="text-blue-500 hover:underline flex items-center gap-1"
+                    onClick={() => handleEdit(city)} // Make sure this is city, not city.id
+                  >
                     <FaEdit /> Edit
                   </button>
 
                   {/* Delete button */}
-                  <button className="text-red-500 hover:underline flex items-center gap-1">
+                  <button className="text-red-500 hover:underline flex items-center gap-1" onClick={() => handleDeleteCity(city.id)}>
                     <FaTrash /> Delete
                   </button>
                 </td>
@@ -63,7 +118,18 @@ const City = () => {
         </table>
       </div>
       {/* Create City Modal */}
-      <CreateCityModal isOpen={createCityModal} onClose={() => setCreateCityModal(false)} />
+      <CreateCityModal
+        isOpen={createCityModal}
+        onClose={() => setCreateCityModal(false)}
+        onCityCreated={handleCityCreated}
+      />
+      {/* Update City Modal */}
+      <UpdateCityModal
+        isOpen={updateCityModal}
+        onClose={() => setUpdateCityModal(false)}
+        onCityUpdated={handleCityUpdated}
+        city={selectedCity}
+      />
     </div>
   );
 };
