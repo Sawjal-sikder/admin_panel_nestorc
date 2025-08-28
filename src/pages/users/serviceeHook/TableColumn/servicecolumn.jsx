@@ -1,6 +1,6 @@
 import React from "react";
 import { Space, Button } from "antd";
-import { EyeOutlined, FormOutlined } from "@ant-design/icons";
+import { EyeOutlined, FormOutlined, DeleteOutlined } from "@ant-design/icons";
 import { MdBlock } from "react-icons/md";
 
 const TableColumn = ({ handleUserDetails, handleUserEdit, blockLoading, handleToggleActive, loadingItems }) => {
@@ -51,9 +51,8 @@ const TableColumn = ({ handleUserDetails, handleUserEdit, blockLoading, handleTo
                                     type="text"
                                     loading={loadingItems.has(record.id)}
                                     onClick={() => handleToggleActive(record.id)}
-                                    icon={<MdBlock className="text-[23px] !text-red-600" />}
+                                    icon={<DeleteOutlined className="text-[23px] !text-red-600" />}
                               />
-
                         </Space>
                   ),
             },
