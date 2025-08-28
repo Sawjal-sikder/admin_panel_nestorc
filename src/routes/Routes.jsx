@@ -9,7 +9,7 @@ const baseUrl = import.meta.env.BASE_URL;
 import Profile from "../pages/profile/Profile";
 import UsersPage from "../pages/users/Users";
 import Services from "../pages/users/services";
-import TermsConditions from "../pages/termsConditions/TermsConditions";
+import City from "../pages/city/City";
 import PrivacyPolicy from "../pages/privacyPolicy/PrivacyPolicy";
 import ProtectedRoute from "../components/ProtectedRoute";
 
@@ -44,8 +44,8 @@ export const router = createBrowserRouter(
           element: <Profile />,
         },
         {
-          path: "terms-conditions",
-          element: <TermsConditions />,
+          path: "city",
+          element: <City />,
         },
         {
           path: "privacy-policy",

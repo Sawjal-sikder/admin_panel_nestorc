@@ -32,11 +32,40 @@ const DetailsModal = ({ visible, data, onClose }) => {
                               />
                         )}
 
-                        <p className="mt-10"><strong>Venue Name:</strong> {data.venue_name}</p>
-                        <p><strong>Latitude:</strong> {data.latitude}</p>
-                        <p><strong>Longitude:</strong> {data.longitude}</p>
-                        <p><strong>City:</strong> {data.city}</p>
-                        <p><strong>Type of Place:</strong> {data.type_of_place}</p>
+                        <div className="mt-4 text-center">
+                              <h2 className="text-2xl font-semibold text-gray-800">{data.venue_name}</h2>
+                        </div>
+                        <div className="text-gray-400 font-semibold text-xl pb-5">Details:</div>
+                        <div className="ps-8">
+
+                              <p><strong>Latitude:</strong> {data.latitude}</p>
+                              <p><strong>Longitude:</strong> {data.longitude}</p>
+                              <p><strong>City:</strong> {data.city}</p>
+                              <p><strong>Type of Place:</strong> {data.type_of_place}</p>
+                              <p><strong>Scavenger Hunts:</strong></p>
+                              <ul className="list-disc pl-8">
+                                    {data.scavenger_hunts && data.scavenger_hunts.length > 0 ? (
+                                          data.scavenger_hunts.map((hunt) => (
+                                                <li key={hunt.id}>
+                                                      <p>{hunt.title}</p>
+                                                      {/* - Checked: {hunt.check?.checked ? "Yes" : "No"} */}
+                                                      {/* {hunt.check?.uploaded_image && (
+                                                      <div>
+                                                      <img
+                                                      src={`http://10.10.7.76:8000${hunt.check.uploaded_image}`}
+                                                      alt={hunt.title}
+                                                      className="mt-2 w-32 h-32 object-cover border"
+                                                      />
+                                                      </div>
+                                                      )} */}
+                                                </li>
+                                          ))
+                                    ) : (
+                                          <li>No scavenger hunts</li>
+                                    )}
+                              </ul>
+                        </div>
+
                   </Modal>
 
                   {/* Fullscreen preview */}

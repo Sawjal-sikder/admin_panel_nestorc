@@ -53,6 +53,11 @@ const Sidebar = ({ onClick }) => {
       icon: <TbPackages />,
       label: <Link to="/services">Services</Link>,
     },
+    {
+      key: "city",
+      icon: <TbPackages />,
+      label: <Link to="/city">City</Link>,
+    },
     // {
     //   key: "settings",
     //   icon: <SettingOutlined />,
