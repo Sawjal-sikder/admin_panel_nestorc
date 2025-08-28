@@ -1,9 +1,9 @@
 import React from "react";
 import { Space, Button } from "antd";
-import { EyeOutlined } from "@ant-design/icons";
+import { EyeOutlined, FormOutlined } from "@ant-design/icons";
 import { MdBlock } from "react-icons/md";
 
-const TableColumn = ({ handleUserDetails, blockLoading, handleToggleActive, loadingItems }) => {
+const TableColumn = ({ handleUserDetails, handleUserEdit, blockLoading, handleToggleActive, loadingItems }) => {
       return [
             {
                   title: "Venue name",
@@ -43,12 +43,17 @@ const TableColumn = ({ handleUserDetails, blockLoading, handleToggleActive, load
                                     onClick={() => handleUserDetails(record)}
                                     className="text-[23px] cursor-pointer text-black-300"
                               />
+                              <FormOutlined
+                                    onClick={() => handleUserEdit(record)}
+                                    className="text-[23px] cursor-pointer text-black-300"
+                              />
                               <Button
                                     type="text"
                                     loading={loadingItems.has(record.id)}
                                     onClick={() => handleToggleActive(record.id)}
-                                    icon={<MdBlock className="text-[23px] text-red-600" />}
+                                    icon={<MdBlock className="text-[23px] !text-red-600" />}
                               />
+
                         </Space>
                   ),
             },

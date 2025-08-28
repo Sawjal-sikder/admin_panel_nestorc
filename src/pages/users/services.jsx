@@ -13,6 +13,7 @@ const MainComponent = () => {
   const [data, setData] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalOpenCreateVenue, setIsModalOpenCreateVenue] = useState(false);
+  const [isModalOpenEdit, setIsModalOpenEdit] = useState(false);
   const [selectedData, setSelectedData] = useState(null);
   const [loadingItems, setLoadingItems] = useState(new Set());
 
@@ -57,11 +58,32 @@ const MainComponent = () => {
 
   // Callback to refresh data after venue creation
   const handleVenueCreated = (newVenue) => {
-    window.location.reload();
+    // Add the new venue to the existing data
+    if (newVenue) {
+      setData((prevData) => [...prevData, newVenue]);
+      message.success("Venue created successfully!");
+    }
+
+    // Close the modal
+    setIsModalOpenCreateVenue(false);
+
+    // Optionally refetch data to ensure consistency with server
+    if (typeof refetch === 'function') {
+      refetch();
+    }
   };
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
+
+
+
+  const handleUserEdit = (record) => {
+    setSelectedData(record);
+    setIsModalOpenEdit(true);
+    console.log("Edit record:", record);
+  };
+
 
   return (
     <>
@@ -75,7 +97,7 @@ const MainComponent = () => {
       </div>
 
       <Table
-        columns={TableColumn({ handleUserDetails, loadingItems, handleToggleActive })}
+        columns={TableColumn({ handleUserDetails, handleUserEdit, loadingItems, handleToggleActive })}
         dataSource={data}
         rowKey="id"
         bordered
@@ -95,7 +117,10 @@ const MainComponent = () => {
         open={isModalOpenCreateVenue}
         onCancel={() => setIsModalOpenCreateVenue(false)}
         footer={null}
-        destroyOnHidden={true}  // Updated from destroyOnClose
+        destroyOnHidden={true}
+        width={800}
+        centered
+        className="px-10"  // Add horizontal padding to the modal
       >
         <CreateVenue onSuccess={handleVenueCreated} />
       </Modal>
