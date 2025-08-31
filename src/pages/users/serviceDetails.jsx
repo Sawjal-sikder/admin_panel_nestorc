@@ -4,6 +4,7 @@ import DefaultImage from "../../assets/image.jpg";
 
 const DetailsModal = ({ visible, data, onClose }) => {
       const [previewVisible, setPreviewVisible] = useState(false);
+      // console.log("DetailsModal data:", data);
 
       if (!data) return null;
 

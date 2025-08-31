@@ -10,6 +10,7 @@ import Profile from "../pages/profile/Profile";
 import UsersPage from "../pages/users/Users";
 import Services from "../pages/users/services";
 import City from "../pages/city/City";
+import GeoFences from "../pages/geofences/GeoFences";
 import PrivacyPolicy from "../pages/privacyPolicy/PrivacyPolicy";
 import ProtectedRoute from "../components/ProtectedRoute";
 
@@ -46,6 +47,10 @@ export const router = createBrowserRouter(
         {
           path: "city",
           element: <City />,
+        },
+        {
+          path: "geo-fences",
+          element: <GeoFences />,
         },
         {
           path: "privacy-policy",
