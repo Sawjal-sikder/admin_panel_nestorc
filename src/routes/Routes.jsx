@@ -8,7 +8,7 @@ import NotFound from "../pages/NotFound";
 const baseUrl = import.meta.env.BASE_URL;
 import Profile from "../pages/profile/Profile";
 import UsersPage from "../pages/users/Users";
-import Services from "../pages/users/services";
+import Venues from "../pages/venues/Venues";
 import City from "../pages/city/City";
 import GeoFences from "../pages/geofences/GeoFences";
 import PrivacyPolicy from "../pages/privacyPolicy/PrivacyPolicy";
@@ -28,17 +28,17 @@ export const router = createBrowserRouter(
         </ProtectedRoute>
       ),
       children: [
+        // {
+        //   path: "",
+        //   element: <Dashboard />,
+        // },
         {
           path: "",
-          element: <Dashboard />,
-        },
-        {
-          path: "user-management",
           element: <UsersPage />,
         },
         {
           path: "venue",
-          element: <Services />,
+          element: <Venues />,
         },
         {
           path: "profile",

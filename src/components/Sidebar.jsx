@@ -28,8 +28,8 @@ const Sidebar = ({ onClick }) => {
   // Determine the selected key based on current route
   const getSelectedKey = () => {
     const path = location.pathname;
-    if (path === "/") return ["dashboard"];
-    if (path === "/user-management") return ["users"];
+    // if (path === "/") return ["dashboard"];
+    if (path === "/") return ["users"];
     if (path === "/venue") return ["venue"];
     if (path === "/profile") return ["settings", "setting-profile"];
     if (path === "/city") return ["settings", "city"];
@@ -39,15 +39,15 @@ const Sidebar = ({ onClick }) => {
   };
 
   const sidebarItems = [
-    {
-      key: "dashboard",
-      icon: <AppstoreOutlined />,
-      label: <Link to="/">Dashboard</Link>,
-    },
+    // {
+    //   key: "dashboard",
+    //   icon: <AppstoreOutlined />,
+    //   label: <Link to="/">Dashboard</Link>,
+    // },
     {
       key: "users",
       icon: <FaUsers />,
-      label: <Link to="/user-management">User Management</Link>,
+      label: <Link to="/">User Management</Link>,
     },
     {
       key: "venue",
