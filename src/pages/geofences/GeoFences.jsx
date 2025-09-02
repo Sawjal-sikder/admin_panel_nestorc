@@ -116,52 +116,6 @@ const GeoFences = () => {
       {/* Reusable Table */}
       <ReusableTable columns={columns} data={citiesData} actions={actions} />
 
-      {/* Modals */}
-      {/* <CreateFormModal
-        isOpen={createCityModal}
-        onClose={() => setCreateCityModal(false)}
-        onCreated={handleCreated}
-        endpoint="/services/geofences/"
-        title="Create Geofence"
-        fields={[
-          { name: "title", label: "Geofence Title", type: "text", placeholder: "Enter geofence title", required: true },
-          { name: "alertMessage", label: "Alert Message", type: "textarea", placeholder: "Enter alert message", required: true },
-          { name: "isRestricted", label: "Is Restricted", type: "boolean", placeholder: "Enter restriction status", required: true },
-          {
-            name: "polygon_points", label: "Polygon Points", type: "array", fields: [
-              { name: "latitude", label: "Latitude", type: "text", step: "any", required: true, placeholder: "Latitude: 32.810894......" },
-              { name: "longitude", label: "Longitude", type: "text", step: "any", required: true, placeholder: "Longitude: -96.778800......" }
-            ]
-          }
-        ]}
-      />
-
-
-      {selectedCity && selectedCity.id && (() => {
-        const endpoint = `/services/geofences/${selectedCity.id}/`;
-        console.log("Endpoint being passed:", endpoint, typeof endpoint); // Debug log
-        return (
-          <UpdateFormModal
-            isOpen={updateCityModal}
-            onClose={() => setUpdateCityModal(false)}
-            onUpdated={handleCityUpdated}
-            endpoint={endpoint}
-            title="Update Geofence"
-            data={selectedCity}
-            fields={[
-              { name: "title", label: "Geofence Title", type: "text", placeholder: "Enter geofence title", required: true },
-              { name: "alertMessage", label: "Alert Message", type: "textarea", placeholder: "Enter alert message", required: true },
-              { name: "isRestricted", label: "Is Restricted", type: "boolean", placeholder: "Enter restriction status", required: true },
-              {
-                name: "polygon_points", label: "Polygon Points", type: "array", fields: [
-                  { name: "latitude", label: "Latitude", type: "text", step: "any", required: true, placeholder: "Latitude: 32.810894......" },
-                  { name: "longitude", label: "Longitude", type: "text", step: "any", required: true, placeholder: "Longitude: -96.778800......" }
-                ]
-              }
-            ]}
-          />
-        );
-      })()} */}
 
       <FormModal
         isOpen={createCityModal}
