@@ -15,6 +15,13 @@ const Venues = () => {
 
   const { data: Venues, loading, error } = useFetch("/services/venues/");
   const { handleDelete } = useDelete("/services/venues");
+  const { data: cityselectData, loading: cityselectLoading, error: cityselectError } = useFetch("/services/cities/");
+  const { data: typeOfPlaceData, loading: typeOfPlaceLoading, error: typeOfPlaceError } = useFetch("/services/places/");
+
+  // Convert data to { value, label } format for selects
+  const cityOptions = Array.isArray(cityselectData) ? cityselectData.map((city) => ({ value: city.id, label: city.name })) : [];
+  const typeOptions = Array.isArray(typeOfPlaceData) ? typeOfPlaceData.map((item) => ({ value: item.id, label: item.name })) : [];
+
 
   useEffect(() => {
     if (Venues) setVenuesData(Venues);
@@ -119,18 +126,16 @@ const Venues = () => {
         isOpen={createVenueModal}
         onClose={() => setCreateVenueModal(false)}
         onSuccess={handleCreated}
-        endpoint="/services/geofences/"
-        title="Create Geofence"
+        endpoint="/services/venues/create/"
+        title="Create Venue"
         fields={[
-          { name: "title", label: "Geofence Title", type: "text", placeholder: "Enter geofence title", required: true },
-          { name: "alertMessage", label: "Alert Message", type: "textarea", placeholder: "Enter alert message", required: true },
-          { name: "isRestricted", label: "Is Restricted", type: "boolean", placeholder: "Enter restriction status", required: true },
-          {
-            name: "polygon_points", label: "Polygon Points", type: "array", fields: [
-              { name: "latitude", label: "Latitude", type: "text", step: "any", required: true, placeholder: "Latitude: 32.810894......" },
-              { name: "longitude", label: "Longitude", type: "text", step: "any", required: true, placeholder: "Longitude: -96.778800......" }
-            ]
-          }
+          { name: "venue_name", label: "Venue Name", type: "text", placeholder: "Enter venue name", required: true },
+          { name: "latitude", label: "Latitude", type: "text", placeholder: "Enter latitude", required: true },
+          { name: "longitude", label: "Longitude", type: "text", placeholder: "Enter longitude", required: true },
+          { name: "city", label: "City", type: "select", placeholder: "Select city", required: true, options: cityOptions, loading: cityselectLoading },
+          { name: "type_of_place", label: "Type of Place", type: "select", placeholder: "Select type of place", required: true, options: typeOptions, loading: typeOfPlaceLoading },
+          { name: "description", label: "Description", type: "textarea", placeholder: "Enter description", required: false },
+          { name: "image", label: "Image", type: "file", placeholder: "Upload image", required: true },
         ]}
         mode="create"
       />
