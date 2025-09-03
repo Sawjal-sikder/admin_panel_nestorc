@@ -148,15 +148,13 @@ const Venues = () => {
           title="Update Venue"
           data={selectedVenue}
           fields={[
-            { name: "title", label: "Venue Title", type: "text", placeholder: "Enter venue title", required: true },
-            { name: "alertMessage", label: "Alert Message", type: "textarea", placeholder: "Enter alert message", required: true },
-            { name: "isRestricted", label: "Is Restricted", type: "boolean", placeholder: "Enter restriction status", required: true },
-            {
-              name: "polygon_points", label: "Polygon Points", type: "array", fields: [
-                { name: "latitude", label: "Latitude", type: "text", step: "any", required: true, placeholder: "Latitude: 32.810894......" },
-                { name: "longitude", label: "Longitude", type: "text", step: "any", required: true, placeholder: "Longitude: -96.778800......" }
-              ]
-            }
+            { name: "venue_name", label: "Venue Name", type: "text", placeholder: "Enter venue name", required: true },
+            { name: "latitude", label: "Latitude", type: "text", placeholder: "Enter latitude", required: true },
+            { name: "longitude", label: "Longitude", type: "text", placeholder: "Enter longitude", required: true },
+            { name: "city", label: "City", type: "select", placeholder: "Select city", required: true, options: cityOptions, loading: cityselectLoading },
+            { name: "type_of_place", label: "Type of Place", type: "select", placeholder: "Select type of place", required: true, options: typeOptions, loading: typeOfPlaceLoading },
+            { name: "description", label: "Description", type: "textarea", placeholder: "Enter description", required: false },
+            { name: "image", label: "Image", type: "file", placeholder: "Upload image", required: true },
           ]}
           mode="update"
         />
