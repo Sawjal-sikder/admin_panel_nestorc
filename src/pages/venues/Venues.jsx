@@ -6,6 +6,7 @@ import useDelete from "../../hook/delete";
 import ReusableTable from "../../hook/TableHook";
 import CreateFormModal from "../../hook/CreateFormModal";
 import FormModal from "../../hook/FormModal";
+import UpdateVenueModal from "./UpdateVenueModal";
 
 const Venues = () => {
   const [venuesData, setVenuesData] = useState([]);
@@ -139,12 +140,12 @@ const Venues = () => {
         ]}
         mode="create"
       />
-      {selectedVenue?.id && (
+      {/* {selectedVenue?.id && (
         <FormModal
           isOpen={updateVenueModal}
           onClose={() => setUpdateVenueModal(false)}
           onSuccess={handleVenueUpdated}
-          endpoint={`/services/geofences/${selectedVenue.id}/`}
+          endpoint={`/services/venues/${selectedVenue.id}/`}
           title="Update Venue"
           data={selectedVenue}
           fields={[
@@ -158,7 +159,23 @@ const Venues = () => {
           ]}
           mode="update"
         />
+      )} */}
+
+
+      {selectedVenue?.id && (
+        <UpdateVenueModal
+          isOpen={updateVenueModal}
+          onClose={() => setUpdateVenueModal(false)}
+          onSuccess={handleVenueUpdated}
+          endpoint={`/services/venues/${selectedVenue.id}/`}
+          data={selectedVenue}
+          cityOptions={cityOptions}
+          typeOptions={typeOptions}
+          cityselectLoading={cityselectLoading}
+          typeOfPlaceLoading={typeOfPlaceLoading}
+        />
       )}
+
 
 
     </div>
