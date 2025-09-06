@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import useApiUpdate from "../../hook/updateVenue";
+import useApiUpdate from "../../hook/UpdateFormModal";
 
 const UpdateVenueModal = ({
       isOpen,
