@@ -73,9 +73,37 @@ const CreateVenue = ({ onSuccess }) => {
             setLoading(true);
 
             try {
-                  const [latitude, longitude] = latLon
-                        .split(",")
-                        .map((v) => parseFloat(v.trim()));
+                  // Validate and parse latitude/longitude
+                  const latLonParts = latLon.split(",");
+                  if (latLonParts.length !== 2) {
+                        alert("Please enter latitude and longitude in the format: latitude, longitude");
+                        setLoading(false);
+                        return;
+                  }
+
+                  const latitude = parseFloat(latLonParts[0].trim());
+                  const longitude = parseFloat(latLonParts[1].trim());
+
+                  if (isNaN(latitude) || isNaN(longitude)) {
+                        alert("Please enter valid numeric values for latitude and longitude");
+                        setLoading(false);
+                        return;
+                  }
+
+                  // Validate latitude and longitude ranges
+                  if (latitude < -90 || latitude > 90) {
+                        alert("Latitude must be between -90 and 90");
+                        setLoading(false);
+                        return;
+                  }
+
+                  if (longitude < -180 || longitude > 180) {
+                        alert("Longitude must be between -180 and 180");
+                        setLoading(false);
+                        return;
+                  }
+
+                  console.log("Parsed coordinates:", { latitude, longitude });
 
                   const formData = new FormData();
                   formData.append("venue_name", venueName);
@@ -89,38 +117,38 @@ const CreateVenue = ({ onSuccess }) => {
                         formData.append("image", image);
                   }
 
-                  // Always send scavenger_hunts field, even if empty
+                  // Prepare scavenger_hunts and venue_message arrays in the exact format the API expects
                   const huntsData = scavengerHunts
                         .filter(hunt => hunt.title && hunt.title.trim())
-                        .map(hunt => ({
-                              title: hunt.title.trim()
-                        }));
+                        .map(hunt => ({ title: hunt.title.trim() }));
 
-                  // Always send venue_message field, even if empty
                   const messagesData = venueMessages
                         .filter(msg => msg.message && msg.message.trim())
-                        .map(msg => ({
-                              message: msg.message.trim()
-                        }));
+                        .map(msg => ({ message: msg.message.trim() }));
 
-                  // Always append scavenger_hunts (empty array if no hunts)
-                  formData.append("scavenger_hunts", JSON.stringify(huntsData));
+                  // Try sending nested arrays as individual FormData fields
+                  huntsData.forEach((hunt, index) => {
+                        formData.append(`scavenger_hunts[${index}][title]`, hunt.title);
+                  });
 
-                  // Always append venue_message (empty array if no messages)
-                  formData.append("venue_message", JSON.stringify(messagesData));
+                  messagesData.forEach((message, index) => {
+                        formData.append(`venue_message[${index}][message]`, message.message);
+                  });
 
-                  // console.log("FormData contents:");
+                  console.log("FormData contents:");
                   for (let [key, value] of formData.entries()) {
-                        // console.log(key, value);
+                        console.log(key, value);
                   }
 
-                  // console.log("Scavenger hunts being sent:", huntsData);
+                  console.log("Scavenger hunts being sent:", huntsData);
+                  console.log("Venue messages being sent:", messagesData);
+                  console.log("Sending all data in single request including nested arrays");
 
                   const res = await API.post("/services/venues/create/", formData, {
                         headers: { "Content-Type": "multipart/form-data" },
                   });
 
-                  // console.log("Venue created successfully:", res.data);
+                  console.log("Venue created successfully:", res.data);
 
                   // Reset form
                   setVenueName("");
@@ -135,8 +163,17 @@ const CreateVenue = ({ onSuccess }) => {
 
                   if (onSuccess) onSuccess(res.data);
             } catch (err) {
-                  // console.error("Error:", err.response?.data || err);
-                  alert("Failed to create venue. Please try again.");
+                  console.error("Error creating venue:", err);
+                  console.error("Error response:", err.response?.data || err);
+                  console.error("Error status:", err.response?.status);
+                  console.error("Error headers:", err.response?.headers);
+
+                  // Show more specific error message
+                  const errorMessage = err.response?.data?.message ||
+                        err.response?.data?.error ||
+                        JSON.stringify(err.response?.data) ||
+                        "Failed to create venue. Please try again.";
+                  alert(`Error: ${errorMessage}`);
             } finally {
                   setLoading(false);
             }
@@ -284,27 +321,21 @@ const CreateVenue = ({ onSuccess }) => {
                         </div>
 
                         {scavengerHunts.map((hunt, index) => (
-                              <div key={index} className="border border-gray-200 rounded p-4 mb-3">
-                                    <div className="flex justify-between items-center mb-2">
-                                          <span className="font-medium text-sm">Hunt #{index + 1}</span>
-                                          <button
-                                                type="button"
-                                                onClick={() => removeScavengerHunt(index)}
-                                                className="bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600"
-                                          >
-                                                Remove
-                                          </button>
-                                    </div>
-                                    <div className="flex flex-col">
-                                          <label className="block text-sm font-medium mb-1">Title</label>
-                                          <input
-                                                type="text"
-                                                className="border border-gray-300 rounded px-3 py-2 w-full"
-                                                value={hunt.title}
-                                                onChange={(e) => updateScavengerHunt(index, 'title', e.target.value)}
-                                                placeholder="Hunt title"
-                                          />
-                                    </div>
+                              <div key={index} className="flex items-center mb-3">
+                                    <input
+                                          type="text"
+                                          className="border border-gray-300 rounded px-3 py-2 w-full"
+                                          value={hunt.title}
+                                          onChange={(e) => updateScavengerHunt(index, 'title', e.target.value)}
+                                          placeholder="Enter scavenger hunt title"
+                                    />
+                                    <button
+                                          type="button"
+                                          onClick={() => removeScavengerHunt(index)}
+                                          className="ml-2 bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600"
+                                    >
+                                          Remove
+                                    </button>
                               </div>
                         ))}
                   </div>
