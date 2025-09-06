@@ -84,7 +84,7 @@ const DetailsModal = ({ visible, data, onClose }) => {
                                                 </li>
                                           ))
                                     ) : (
-                                          <li>No scavenger hunts</li>
+                                          <li>No Messages</li>
                                     )}
                               </ul>
                         </div>

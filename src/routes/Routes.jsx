@@ -9,6 +9,7 @@ const baseUrl = import.meta.env.BASE_URL;
 import Profile from "../pages/profile/Profile";
 import UsersPage from "../pages/users/Users";
 import Venues from "../pages/venues/Venues";
+import Service from "../pages/users/services";
 import City from "../pages/city/City";
 import GeoFences from "../pages/geofences/GeoFences";
 import PrivacyPolicy from "../pages/privacyPolicy/PrivacyPolicy";
@@ -38,7 +39,7 @@ export const router = createBrowserRouter(
         },
         {
           path: "venue",
-          element: <Venues />,
+          element: <Service />,
         },
         {
           path: "profile",
@@ -48,6 +49,7 @@ export const router = createBrowserRouter(
           path: "city",
           element: <City />,
         },
+
         {
           path: "geo-fences",
           element: <GeoFences />,

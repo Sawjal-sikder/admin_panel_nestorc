@@ -12,6 +12,7 @@ const CreateVenue = ({ onSuccess }) => {
       const [loading, setLoading] = useState(false);
       const [errors, setErrors] = useState({});
       const [scavengerHunts, setScavengerHunts] = useState([]);
+      const [venueMessages, setVenueMessages] = useState([]);
 
       // Fetch cities and places at the top level
       const { data: cities, loading: citiesLoading } = useFetchData("/services/cities/");
@@ -44,6 +45,22 @@ const CreateVenue = ({ onSuccess }) => {
                   i === index ? { ...hunt, [field]: value } : hunt
             );
             setScavengerHunts(updatedHunts);
+      };
+
+      const addVenueMessage = () => {
+            setVenueMessages([...venueMessages, { id: Date.now(), message: "" }]);
+      };
+
+      const removeVenueMessage = (index) => {
+            const updatedMessages = venueMessages.filter((_, i) => i !== index);
+            setVenueMessages(updatedMessages);
+      };
+
+      const updateVenueMessage = (index, value) => {
+            const updatedMessages = venueMessages.map((msg, i) =>
+                  i === index ? { ...msg, message: value } : msg
+            );
+            setVenueMessages(updatedMessages);
       };
 
       const handleSubmit = async (e) => {
@@ -79,8 +96,18 @@ const CreateVenue = ({ onSuccess }) => {
                               title: hunt.title.trim()
                         }));
 
+                  // Always send venue_message field, even if empty
+                  const messagesData = venueMessages
+                        .filter(msg => msg.message && msg.message.trim())
+                        .map(msg => ({
+                              message: msg.message.trim()
+                        }));
+
                   // Always append scavenger_hunts (empty array if no hunts)
                   formData.append("scavenger_hunts", JSON.stringify(huntsData));
+
+                  // Always append venue_message (empty array if no messages)
+                  formData.append("venue_message", JSON.stringify(messagesData));
 
                   // console.log("FormData contents:");
                   for (let [key, value] of formData.entries()) {
@@ -103,6 +130,7 @@ const CreateVenue = ({ onSuccess }) => {
                   setPlace("");
                   setImage(null);
                   setScavengerHunts([]);
+                  setVenueMessages([]);
                   setErrors({});
 
                   if (onSuccess) onSuccess(res.data);
@@ -281,7 +309,38 @@ const CreateVenue = ({ onSuccess }) => {
                         ))}
                   </div>
 
-                  {/* Image Upload */}
+                  {/* Venue Messages Section */}
+                  <div className="flex flex-col">
+                        <div className="flex justify-between items-center mb-3">
+                              <label className="font-medium">Venue Messages</label>
+                              <button
+                                    type="button"
+                                    onClick={addVenueMessage}
+                                    className="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700"
+                              >
+                                    Add Message
+                              </button>
+                        </div>
+
+                        {venueMessages.map((msg, index) => (
+                              <div key={msg.id} className="flex items-center mb-3">
+                                    <input
+                                          type="text"
+                                          className="border border-gray-300 rounded px-3 py-2 w-full"
+                                          value={msg.message}
+                                          onChange={(e) => updateVenueMessage(index, e.target.value)}
+                                          placeholder="Enter venue message"
+                                    />
+                                    <button
+                                          type="button"
+                                          onClick={() => removeVenueMessage(index)}
+                                          className="ml-2 bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600"
+                                    >
+                                          Remove
+                                    </button>
+                              </div>
+                        ))}
+                  </div>
                   <div className="flex flex-col">
                         <label className="mb-1 font-medium">Upload Image</label>
                         <input
