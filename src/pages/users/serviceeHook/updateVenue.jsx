@@ -223,7 +223,7 @@ const UpdateVenue = ({ venueData, onSuccess, onCancel }) => {
                   onSubmit={handleSubmit}
                   className="max-w-2xl mx-auto p-6 border-t-2 border-gray-200 space-y-6"
             >
-                  <div className="flex justify-between items-center mb-4">
+                  {/* <div className="flex justify-between items-center mb-4">
                         <h2 className="text-xl font-semibold text-gray-700">Update Venue</h2>
                         {onCancel && (
                               <button
@@ -234,7 +234,7 @@ const UpdateVenue = ({ venueData, onSuccess, onCancel }) => {
                                     ✕
                               </button>
                         )}
-                  </div>
+                  </div> */}
 
                   {/* Venue Name */}
                   <div className="flex flex-col">
