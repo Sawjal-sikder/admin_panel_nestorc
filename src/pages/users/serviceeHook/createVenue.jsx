@@ -103,7 +103,7 @@ const CreateVenue = ({ onSuccess }) => {
                         return;
                   }
 
-                  console.log("Parsed coordinates:", { latitude, longitude });
+                  // console.log("Parsed coordinates:", { latitude, longitude });
 
                   const formData = new FormData();
                   formData.append("venue_name", venueName);
@@ -135,20 +135,20 @@ const CreateVenue = ({ onSuccess }) => {
                         formData.append(`venue_message[${index}][message]`, message.message);
                   });
 
-                  console.log("FormData contents:");
+                  // console.log("FormData contents:");
                   for (let [key, value] of formData.entries()) {
-                        console.log(key, value);
+                        // console.log(key, value);
                   }
 
-                  console.log("Scavenger hunts being sent:", huntsData);
-                  console.log("Venue messages being sent:", messagesData);
-                  console.log("Sending all data in single request including nested arrays");
+                  // console.log("Scavenger hunts being sent:", huntsData);
+                  // console.log("Venue messages being sent:", messagesData);
+                  // console.log("Sending all data in single request including nested arrays");
 
                   const res = await API.post("/services/venues/create/", formData, {
                         headers: { "Content-Type": "multipart/form-data" },
                   });
 
-                  console.log("Venue created successfully:", res.data);
+                  // console.log("Venue created successfully:", res.data);
 
                   // Reset form
                   setVenueName("");

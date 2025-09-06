@@ -152,7 +152,7 @@ const UpdateVenue = ({ venueData, onSuccess, onCancel }) => {
                         return;
                   }
 
-                  console.log("Parsed coordinates:", { latitude, longitude });
+                  // console.log("Parsed coordinates:", { latitude, longitude });
 
                   const formData = new FormData();
                   formData.append("venue_name", venueName);
@@ -185,20 +185,20 @@ const UpdateVenue = ({ venueData, onSuccess, onCancel }) => {
                         formData.append(`venue_message[${index}][message]`, message.message);
                   });
 
-                  console.log("FormData contents:");
+                  // console.log("FormData contents:");
                   for (let [key, value] of formData.entries()) {
-                        console.log(key, value);
+                        // console.log(key, value);
                   }
 
-                  console.log("Scavenger hunts being sent:", huntsData);
-                  console.log("Venue messages being sent:", messagesData);
-                  console.log("Updating venue with ID:", venueData.id);
+                  // console.log("Scavenger hunts being sent:", huntsData);
+                  // console.log("Venue messages being sent:", messagesData);
+                  // console.log("Updating venue with ID:", venueData.id);
 
-                  const res = await API.put(`/services/venues/${venueData.id}/`, formData, {
+                  const res = await API.put(`/services/venues/update/${venueData.id}/`, formData, {
                         headers: { "Content-Type": "multipart/form-data" },
                   });
 
-                  console.log("Venue updated successfully:", res.data);
+                  // console.log("Venue updated successfully:", res.data);
 
                   if (onSuccess) onSuccess(res.data);
             } catch (err) {

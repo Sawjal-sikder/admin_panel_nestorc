@@ -43,9 +43,10 @@ const TableColumn = ({ handleUserDetails, handleUserEdit, blockLoading, handleTo
                                     onClick={() => handleUserDetails(record)}
                                     className="text-[23px] cursor-pointer text-black-300"
                               />
-                              <FormOutlined
+                              <Button
+                                    type="text"
                                     onClick={() => handleUserEdit(record)}
-                                    className="text-[23px] cursor-pointer text-blue-600 hover:text-blue-800"
+                                    icon={<FormOutlined className="text-[23px] !text-blue-600" />}
                               />
                               <Button
                                     type="text"
