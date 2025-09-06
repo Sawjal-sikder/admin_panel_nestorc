@@ -65,6 +65,28 @@ const DetailsModal = ({ visible, data, onClose }) => {
                                           <li>No scavenger hunts</li>
                                     )}
                               </ul>
+                              <p><strong>Messages for Venue:</strong></p>
+                              <ul className="list-disc pl-8">
+                                    {data.venue_message && data.venue_message.length > 0 ? (
+                                          data.venue_message.map((message) => (
+                                                <li key={message.id}>
+                                                      <p>{message.message}</p>
+                                                      {/* - Checked: {message.check?.checked ? "Yes" : "No"} */}
+                                                      {/* {message.check?.uploaded_image && (
+                                                      <div>
+                                                      <img
+                                                      src={`http://10.10.7.76:8000${message.check.uploaded_image}`}
+                                                      alt={message.content}
+                                                      className="mt-2 w-32 h-32 object-cover border"
+                                                      />
+                                                      </div>
+                                                      )} */}
+                                                </li>
+                                          ))
+                                    ) : (
+                                          <li>No scavenger hunts</li>
+                                    )}
+                              </ul>
                         </div>
 
                   </Modal>
