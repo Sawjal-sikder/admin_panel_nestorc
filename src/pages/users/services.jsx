@@ -4,6 +4,7 @@ import servicedataHook from "./serviceeHook/servicedataHook";
 import TableColumn from "./serviceeHook/TableColumn/servicecolumn";
 import DetailsModal from "./serviceDetails";
 import CreateVenue from "./serviceeHook/createVenue";
+import UpdateVenue from "./serviceeHook/updateVenue";
 import useDelete from "../../hook/delete";
 
 const MainComponent = () => {
@@ -13,8 +14,10 @@ const MainComponent = () => {
   const [data, setData] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalOpenCreateVenue, setIsModalOpenCreateVenue] = useState(false);
+  const [isModalOpenUpdateVenue, setIsModalOpenUpdateVenue] = useState(false);
   const [isModalOpenEdit, setIsModalOpenEdit] = useState(false);
   const [selectedData, setSelectedData] = useState(null);
+  const [selectedVenueForUpdate, setSelectedVenueForUpdate] = useState(null);
   const [loadingItems, setLoadingItems] = useState(new Set());
 
   // Update local data when initial data changes
@@ -79,9 +82,37 @@ const MainComponent = () => {
 
 
   const handleUserEdit = (record) => {
-    setSelectedData(record);
-    setIsModalOpenEdit(true);
+    setSelectedVenueForUpdate(record);
+    setIsModalOpenUpdateVenue(true);
     console.log("Edit record:", record);
+  };
+
+  // Callback to handle successful venue update
+  const handleVenueUpdated = (updatedVenue) => {
+    // Update the venue in the existing data
+    if (updatedVenue) {
+      setData((prevData) =>
+        prevData.map(venue =>
+          venue.id === updatedVenue.id ? updatedVenue : venue
+        )
+      );
+      message.success("Venue updated successfully!");
+    }
+
+    // Close the modal
+    setIsModalOpenUpdateVenue(false);
+    setSelectedVenueForUpdate(null);
+
+    // Optionally refetch data to ensure consistency with server
+    if (typeof refetch === 'function') {
+      refetch();
+    }
+  };
+
+  // Callback to handle update modal cancel
+  const handleUpdateCancel = () => {
+    setIsModalOpenUpdateVenue(false);
+    setSelectedVenueForUpdate(null);
   };
 
 
@@ -123,6 +154,26 @@ const MainComponent = () => {
         className="px-10"  // Add horizontal padding to the modal
       >
         <CreateVenue onSuccess={handleVenueCreated} />
+      </Modal>
+
+      {/* Update Venue Modal */}
+      <Modal
+        title="Update Venue"
+        open={isModalOpenUpdateVenue}
+        onCancel={handleUpdateCancel}
+        footer={null}
+        destroyOnHidden={true}
+        width={800}
+        centered
+        className="px-10"  // Add horizontal padding to the modal
+      >
+        {selectedVenueForUpdate && (
+          <UpdateVenue
+            venueData={selectedVenueForUpdate}
+            onSuccess={handleVenueUpdated}
+            onCancel={handleUpdateCancel}
+          />
+        )}
       </Modal>
     </>
   );

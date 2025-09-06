@@ -43,10 +43,10 @@ const TableColumn = ({ handleUserDetails, handleUserEdit, blockLoading, handleTo
                                     onClick={() => handleUserDetails(record)}
                                     className="text-[23px] cursor-pointer text-black-300"
                               />
-                              {/* <FormOutlined
+                              <FormOutlined
                                     onClick={() => handleUserEdit(record)}
-                                    className="text-[23px] cursor-pointer text-black-300"
-                              /> */}
+                                    className="text-[23px] cursor-pointer text-blue-600 hover:text-blue-800"
+                              />
                               <Button
                                     type="text"
                                     loading={loadingItems.has(record.id)}
