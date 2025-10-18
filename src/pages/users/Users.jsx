@@ -111,6 +111,28 @@ function UsersPage() {
     }));
   };
 
+const handlePremium = async (userId, checked) => {
+  try {
+    await API.post(`auth/users/premium/${userId}/`, { is_premium: checked });
+    
+    // Refresh the user data after successful update
+    refetch();
+    
+    openNotification(
+      "success", 
+      "Success", 
+      `Premium status ${checked ? 'enabled' : 'disabled'} successfully`
+    );
+  } catch (error) {
+    openNotification(
+      "error", 
+      "Error", 
+      error.response?.data?.detail || "Failed to update premium status"
+    );
+    return;
+  }
+};
+
   const columns = [
     {
       title: <span className="text-md !text-center">Full Name</span>,
@@ -138,12 +160,29 @@ function UsersPage() {
       render: (phone) => (
         <span className="text-sm">{phone}</span>
       ),
-    }, {
+    }, 
+    {
       title: <span className="text-md">Status</span>,
       dataIndex: "is_active",
       key: "is_active",
       render: (isActive) => (
         <span className="text-sm">{isActive ? "Active" : "Inactive"}</span>
+      ),
+    },
+    {
+      title: <span className="text-md">Premium User</span>,
+      dataIndex: "is_premium",
+      key: "is_premium",
+      render: (isPremium, record) => (
+        <div className="flex items-center gap-2">
+          {/* <input type="checkbox" checked={isPremium}  onClick={() => handlePremium(isPremium)}/> */}
+          <input 
+            type="checkbox" 
+            checked={isPremium} 
+            onChange={(e) => handlePremium(record.id, e.target.checked)} 
+          />
+          <span className="text-sm">{isPremium ? "Yes" : "No"}</span>
+        </div>
       ),
     },
     {

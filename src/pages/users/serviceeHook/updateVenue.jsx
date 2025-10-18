@@ -53,7 +53,9 @@ const UpdateVenue = ({ venueData, onSuccess, onCancel }) => {
                   if (venueData.scavenger_hunts && Array.isArray(venueData.scavenger_hunts)) {
                         setScavengerHunts(venueData.scavenger_hunts.map(hunt => ({
                               id: hunt.id || Date.now() + Math.random(),
-                              title: hunt.title || ""
+                              title: hunt.title || "",
+                              image: null, // For new images
+                              currentImage: hunt.image || null // For existing images
                         })));
                   }
 
@@ -81,7 +83,7 @@ const UpdateVenue = ({ venueData, onSuccess, onCancel }) => {
       };
 
       const addScavengerHunt = () => {
-            setScavengerHunts([...scavengerHunts, { id: Date.now(), title: "" }]);
+            setScavengerHunts([...scavengerHunts, { id: Date.now(), title: "", image: null, currentImage: null }]);
       };
 
       const removeScavengerHunt = (index) => {
@@ -170,15 +172,23 @@ const UpdateVenue = ({ venueData, onSuccess, onCancel }) => {
                   // Prepare scavenger_hunts and venue_message arrays in the exact format the API expects
                   const huntsData = scavengerHunts
                         .filter(hunt => hunt.title && hunt.title.trim())
-                        .map(hunt => ({ title: hunt.title.trim() }));
+                        .map(hunt => ({
+                              title: hunt.title.trim(),
+                              image: hunt.image,
+                              currentImage: hunt.currentImage
+                        }));
 
                   const messagesData = venueMessages
                         .filter(msg => msg.message && msg.message.trim())
                         .map(msg => ({ message: msg.message.trim() }));
 
-                  // Try sending nested arrays as individual FormData fields
+                  // Add scavenger hunts with optional images to FormData
                   huntsData.forEach((hunt, index) => {
                         formData.append(`scavenger_hunts[${index}][title]`, hunt.title);
+                        // Only append image if a new one is selected
+                        if (hunt.image) {
+                              formData.append(`scavenger_hunts[${index}][image]`, hunt.image);
+                        }
                   });
 
                   messagesData.forEach((message, index) => {
@@ -373,21 +383,87 @@ const UpdateVenue = ({ venueData, onSuccess, onCancel }) => {
                         </div>
 
                         {scavengerHunts.map((hunt, index) => (
-                              <div key={hunt.id || index} className="flex items-center mb-3">
-                                    <input
-                                          type="text"
-                                          className="border border-gray-300 rounded px-3 py-2 w-full"
-                                          value={hunt.title}
-                                          onChange={(e) => updateScavengerHunt(index, 'title', e.target.value)}
-                                          placeholder="Enter scavenger hunt title"
-                                    />
-                                    <button
-                                          type="button"
-                                          onClick={() => removeScavengerHunt(index)}
-                                          className="ml-2 bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600"
-                                    >
-                                          Remove
-                                    </button>
+                              <div key={hunt.id || index} className="border border-gray-200 rounded p-4 mb-4">
+                                    <div className="flex items-center mb-3">
+                                          <input
+                                                type="text"
+                                                className="border border-gray-300 rounded px-3 py-2 flex-1"
+                                                value={hunt.title}
+                                                onChange={(e) => updateScavengerHunt(index, 'title', e.target.value)}
+                                                placeholder="Enter scavenger hunt title"
+                                          />
+                                          <button
+                                                type="button"
+                                                onClick={() => removeScavengerHunt(index)}
+                                                className="ml-2 bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600"
+                                          >
+                                                Remove
+                                          </button>
+                                    </div>
+
+                                    {/* Image upload for this scavenger hunt */}
+                                    <div className="flex flex-col">
+                                          <label className="mb-1 text-sm font-medium text-gray-600">
+                                                Upload Image (Optional)
+                                          </label>
+
+                                          {/* Show current image if exists and no new image selected */}
+                                          {hunt.currentImage && !hunt.image && (
+                                                <div className="mb-2">
+                                                      <p className="text-xs text-gray-500 mb-1">Current image:</p>
+                                                      <div className="relative inline-block">
+                                                            <img
+                                                                  src={hunt.currentImage}
+                                                                  alt="Current scavenger hunt"
+                                                                  className="h-20 w-auto border rounded"
+                                                            />
+                                                            <button
+                                                                  type="button"
+                                                                  onClick={() => updateScavengerHunt(index, 'currentImage', null)}
+                                                                  className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600"
+                                                                  style={{ transform: 'translate(50%, -50%)' }}
+                                                                  title="Remove current image"
+                                                            >
+                                                                  ×
+                                                            </button>
+                                                      </div>
+                                                </div>
+                                          )}
+
+                                          <input
+                                                type="file"
+                                                accept="image/*"
+                                                className="border border-gray-300 rounded px-3 py-2 text-sm"
+                                                onChange={(e) => updateScavengerHunt(index, 'image', e.target.files[0])}
+                                          />
+
+                                          {/* Show new image preview */}
+                                          {hunt.image && (
+                                                <div className="mt-2">
+                                                      <p className="text-xs text-gray-500 mb-1">New image preview:</p>
+                                                      <div className="relative inline-block">
+                                                            <img
+                                                                  src={URL.createObjectURL(hunt.image)}
+                                                                  alt="New scavenger hunt preview"
+                                                                  className="h-20 w-auto border rounded"
+                                                            />
+                                                            <button
+                                                                  type="button"
+                                                                  onClick={() => updateScavengerHunt(index, 'image', null)}
+                                                                  className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600"
+                                                                  style={{ transform: 'translate(50%, -50%)' }}
+                                                                  title="Remove new image"
+                                                            >
+                                                                  ×
+                                                            </button>
+                                                      </div>
+                                                </div>
+                                          )}
+
+                                          <p className="text-xs text-gray-500 mt-1">
+                                                {hunt.currentImage ? "Upload new image to replace current one" : "Upload an image for this hunt"}
+                                          </p>
+                                    </div>
                               </div>
                         ))}
                   </div>
