@@ -84,7 +84,7 @@ const MainComponent = () => {
   const handleUserEdit = (record) => {
     setSelectedVenueForUpdate(record);
     setIsModalOpenUpdateVenue(true);
-    console.log("Edit record:", record);
+    // console.log("Edit record:", record);
   };
 
   // Callback to handle successful venue update

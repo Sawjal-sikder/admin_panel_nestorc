@@ -13,6 +13,7 @@ const CreateVenue = ({ onSuccess }) => {
       const [errors, setErrors] = useState({});
       const [scavengerHunts, setScavengerHunts] = useState([]);
       const [venueMessages, setVenueMessages] = useState([]);
+      const [stops, setStops] = useState([]);
 
       // Fetch cities and places at the top level
       const { data: cities, loading: citiesLoading } = useFetchData("/services/cities/");
@@ -61,6 +62,22 @@ const CreateVenue = ({ onSuccess }) => {
                   i === index ? { ...msg, message: value } : msg
             );
             setVenueMessages(updatedMessages);
+      };
+
+      const addStop = () => {
+            setStops([...stops, { name: "", latitude: "", longitude: "" }]);
+      };
+
+      const removeStop = (index) => {
+            const updatedStops = stops.filter((_, i) => i !== index);
+            setStops(updatedStops);
+      };
+
+      const updateStop = (index, field, value) => {
+            const updatedStops = stops.map((stop, i) =>
+                  i === index ? { ...stop, [field]: value } : stop
+            );
+            setStops(updatedStops);
       };
 
       const handleSubmit = async (e) => {
@@ -139,6 +156,21 @@ const CreateVenue = ({ onSuccess }) => {
                         formData.append(`venue_message[${index}][message]`, message.message);
                   });
 
+                  // Add stops data to FormData
+                  const stopsData = stops
+                        .filter(stop => stop.name && stop.name.trim() && stop.latitude && stop.longitude)
+                        .map(stop => ({
+                              name: stop.name.trim(),
+                              latitude: parseFloat(stop.latitude),
+                              longitude: parseFloat(stop.longitude)
+                        }));
+
+                  stopsData.forEach((stop, index) => {
+                        formData.append(`stops[${index}][name]`, stop.name);
+                        formData.append(`stops[${index}][latitude]`, stop.latitude);
+                        formData.append(`stops[${index}][longitude]`, stop.longitude);
+                  });
+
                   // console.log("FormData contents:");
                   for (let [key, value] of formData.entries()) {
                         // console.log(key, value);
@@ -163,6 +195,7 @@ const CreateVenue = ({ onSuccess }) => {
                   setImage(null);
                   setScavengerHunts([]);
                   setVenueMessages([]);
+                  setStops([]);
                   setErrors({});
 
                   if (onSuccess) onSuccess(res.data);
@@ -310,8 +343,68 @@ const CreateVenue = ({ onSuccess }) => {
                               <span className="text-red-500 text-sm mt-1">Place selection is required</span>
                         )}
                   </div>
-                  {/* Stops Section field: name, latitude, longitude */}
+                  {/* Stops Section */}
+                  <div className="flex flex-col">
+                        <div className="flex justify-between items-center mb-3">
+                              <label className="font-medium">Stops</label>
+                              <button
+                                    type="button"
+                                    onClick={addStop}
+                                    className="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700"
+                              >
+                                    Add Stop
+                              </button>
+                        </div>
 
+                        {stops.map((stop, index) => (
+                              <div key={index} className="border border-gray-200 rounded p-4 mb-4">
+                                    <div className="flex items-center mb-3">
+                                          <input
+                                                type="text"
+                                                className="border border-gray-300 rounded px-3 py-2 flex-1"
+                                                value={stop.name}
+                                                onChange={(e) => updateStop(index, 'name', e.target.value)}
+                                                placeholder="Enter stop name"
+                                          />
+                                          <button
+                                                type="button"
+                                                onClick={() => removeStop(index)}
+                                                className="ml-2 bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600"
+                                          >
+                                                Remove
+                                          </button>
+                                    </div>
+
+                                    {/* Latitude and Longitude inputs */}
+                                    <div className="grid grid-cols-2 gap-3">
+                                          <div className="flex flex-col">
+                                                <label className="mb-1 text-sm font-medium text-gray-600">
+                                                      Latitude
+                                                </label>
+                                                <input
+                                                      type="text"
+                                                      className="border border-gray-300 rounded px-3 py-2 text-sm"
+                                                      value={stop.latitude}
+                                                      onChange={(e) => updateStop(index, 'latitude', e.target.value)}
+                                                      placeholder="Enter latitude"
+                                                />
+                                          </div>
+                                          <div className="flex flex-col">
+                                                <label className="mb-1 text-sm font-medium text-gray-600">
+                                                      Longitude
+                                                </label>
+                                                <input
+                                                      type="text"
+                                                      className="border border-gray-300 rounded px-3 py-2 text-sm"
+                                                      value={stop.longitude}
+                                                      onChange={(e) => updateStop(index, 'longitude', e.target.value)}
+                                                      placeholder="Enter longitude"
+                                                />
+                                          </div>
+                                    </div>
+                              </div>
+                        ))}
+                  </div>
 
                   {/* Scavenger Hunts Section */}
                   <div className="flex flex-col">
