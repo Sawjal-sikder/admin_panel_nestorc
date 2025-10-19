@@ -9,7 +9,7 @@ const useServiceData = () => {
       const fetchData = useCallback(async () => {
             setLoading(true);
             try {
-                  const response = await API.get("/services/venues/");
+                  const response = await API.get("/services/venues/admin/");
                   setData(response.data);
             } catch (err) {
                   setError(err);

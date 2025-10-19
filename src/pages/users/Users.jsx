@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { Table, Space, Avatar, Button, Modal, notification, } from "antd";
+import { Table, Space, Avatar, Button, Modal, notification, Input } from "antd";
 import { key } from "localforage";
 import { MdBlock } from "react-icons/md";
 import UserDetailsModal from "./UserDetailsModal";
 
-import { EyeOutlined, ExclamationCircleOutlined, } from "@ant-design/icons";
+import { EyeOutlined, ExclamationCircleOutlined, SearchOutlined } from "@ant-design/icons";
 import IsLoading from "../../components/IsLoading";
 import IsError from "../../components/IsError";
 import { useAllUsers } from "../../services/usersServices";
@@ -270,6 +270,24 @@ const handlePremium = async (userId, checked) => {
           </Button>
         </div>
       </div>
+      
+      {/* Search Bar */}
+      <div className="flex justify-between items-center">
+        <Input.Search
+          placeholder="Search users by name, email, or phone..."
+          allowClear
+          enterButton={<SearchOutlined />}
+          size="large"
+          className="max-w-md"
+          onSearch={handleSearch}
+          onChange={(e) => {
+            if (e.target.value === '') {
+              handleSearch('');
+            }
+          }}
+        />
+      </div>
+      
       <Table
         columns={columns}
         dataSource={allUsers}

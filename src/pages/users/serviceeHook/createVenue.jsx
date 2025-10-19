@@ -310,6 +310,8 @@ const CreateVenue = ({ onSuccess }) => {
                               <span className="text-red-500 text-sm mt-1">Place selection is required</span>
                         )}
                   </div>
+                  {/* Stops Section field: name, latitude, longitude */}
+
 
                   {/* Scavenger Hunts Section */}
                   <div className="flex flex-col">

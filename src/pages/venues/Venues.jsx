@@ -14,7 +14,7 @@ const Venues = () => {
   const [updateVenueModal, setUpdateVenueModal] = useState(false);
   const [selectedVenue, setSelectedVenue] = useState(null);
 
-  const { data: Venues, loading, error } = useFetch("/services/venues/");
+  const { data: Venues, loading, error } = useFetch("/services/venues/admin/");
   const { handleDelete } = useDelete("/services/venues");
   const { data: cityselectData, loading: cityselectLoading, error: cityselectError } = useFetch("/services/cities/");
   const { data: typeOfPlaceData, loading: typeOfPlaceLoading, error: typeOfPlaceError } = useFetch("/services/places/");
