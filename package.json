@@ -4,11 +4,11 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --port 14001",
-    "build": "vite build",
-  
+    "dev": "node --enable-source-maps node_modules/vite/dist/node/cli.js --port 14001",
+    "build": "node --enable-source-maps node_modules/vite/dist/node/cli.js build",
+
     "lint": "eslint .",
-    "preview": "vite preview --port 14001",
+    "preview": "node --enable-source-maps node_modules/vite/dist/node/cli.js preview --port 14001",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist"
   },

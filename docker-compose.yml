@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  admin_panel_nestore:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: nastorc-admin-panel:dev
+    ports:
+      - "14001:14001"
+    environment:
+      - HOST=0.0.0.0
+      - PORT=14001
+    volumes:
+      - ./:/app:delegated
+      # keep node_modules inside the container to avoid host/OS differences
+      - node_modules:/app/node_modules
+    # forward stdout/stderr
+    tty: true
+    stdin_open: true
+    # useful for local development; remove for production
+    command: ["npm", "run", "dev"]
+
+volumes:
+  node_modules:
+    name: admin_panel_node_modules
