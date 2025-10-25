@@ -55,6 +55,8 @@ const UpdateVenue = ({ venueData, onSuccess, onCancel }) => {
                         setScavengerHunts(venueData.scavenger_hunts.map(hunt => ({
                               id: hunt.id || Date.now() + Math.random(),
                               title: hunt.title || "",
+                              latitude: hunt.latitude?.toString() || "",
+                              longitude: hunt.longitude?.toString() || "",
                               image: null, // For new images
                               currentImage: hunt.image || null // For existing images
                         })));
@@ -94,7 +96,7 @@ const UpdateVenue = ({ venueData, onSuccess, onCancel }) => {
       };
 
       const addScavengerHunt = () => {
-            setScavengerHunts([...scavengerHunts, { id: Date.now(), title: "", image: null, currentImage: null }]);
+            setScavengerHunts([...scavengerHunts, { id: Date.now(), title: "", image: null, latitude: "", longitude: "", currentImage: null }]);
       };
 
       const removeScavengerHunt = (index) => {
@@ -183,13 +185,55 @@ const UpdateVenue = ({ venueData, onSuccess, onCancel }) => {
 
                   // console.log("Parsed coordinates:", { latitude, longitude });
 
+                  // Validate city and place selections
+                  const cityId = Number(city);
+                  const placeId = Number(place);
+                  
+                  if (isNaN(cityId) || cityId <= 0) {
+                        alert("Please select a valid city");
+                        setLoading(false);
+                        return;
+                  }
+                  
+                  if (isNaN(placeId) || placeId <= 0) {
+                        alert("Please select a valid place");
+                        setLoading(false);
+                        return;
+                  }
+
+                  // Check for incomplete scavenger hunts and warn user
+                  const incompleteHunts = scavengerHunts.filter(hunt => {
+                        if (!hunt.title || !hunt.title.trim()) return false; // Empty hunts are fine to ignore
+                        if (!hunt.latitude || !hunt.latitude.trim()) return true;
+                        if (!hunt.longitude || !hunt.longitude.trim()) return true;
+                        
+                        const lat = parseFloat(hunt.latitude.trim());
+                        const lng = parseFloat(hunt.longitude.trim());
+                        
+                        if (isNaN(lat) || isNaN(lng)) return true;
+                        if (lat < -90 || lat > 90) return true;
+                        if (lng < -180 || lng > 180) return true;
+                        
+                        return false;
+                  });
+
+                  if (incompleteHunts.length > 0) {
+                        const shouldContinue = confirm(
+                              `Warning: ${incompleteHunts.length} scavenger hunt(s) have missing or invalid latitude/longitude coordinates and will not be saved. Do you want to continue?`
+                        );
+                        if (!shouldContinue) {
+                              setLoading(false);
+                              return;
+                        }
+                  }
+
                   const formData = new FormData();
                   formData.append("venue_name", venueName);
-                  formData.append("latitude", latitude);
-                  formData.append("longitude", longitude);
+                  formData.append("latitude", latitude.toString());
+                  formData.append("longitude", longitude.toString());
                   formData.append("description", description);
-                  formData.append("city", Number(city));
-                  formData.append("type_of_place", Number(place));
+                  formData.append("city", Number(city).toString());
+                  formData.append("type_of_place", Number(place).toString());
 
                   // Only append image if a new one is selected
                   if (image) {
@@ -198,10 +242,26 @@ const UpdateVenue = ({ venueData, onSuccess, onCancel }) => {
 
                   // Prepare scavenger_hunts and venue_message arrays in the exact format the API expects
                   const huntsData = scavengerHunts
-                        .filter(hunt => hunt.title && hunt.title.trim())
+                        .filter(hunt => {
+                              if (!hunt.title || !hunt.title.trim()) return false;
+                              if (!hunt.latitude || !hunt.latitude.trim()) return false;
+                              if (!hunt.longitude || !hunt.longitude.trim()) return false;
+                              
+                              const lat = parseFloat(hunt.latitude.trim());
+                              const lng = parseFloat(hunt.longitude.trim());
+                              
+                              // Validate latitude and longitude ranges
+                              if (isNaN(lat) || isNaN(lng)) return false;
+                              if (lat < -90 || lat > 90) return false;
+                              if (lng < -180 || lng > 180) return false;
+                              
+                              return true;
+                        })
                         .map(hunt => ({
                               title: hunt.title.trim(),
                               image: hunt.image,
+                              latitude: parseFloat(hunt.latitude.trim()),
+                              longitude: parseFloat(hunt.longitude.trim()),
                               currentImage: hunt.currentImage
                         }));
 
@@ -220,6 +280,8 @@ const UpdateVenue = ({ venueData, onSuccess, onCancel }) => {
                   // Add scavenger hunts with optional images to FormData
                   huntsData.forEach((hunt, index) => {
                         formData.append(`scavenger_hunts[${index}][title]`, hunt.title);
+                        formData.append(`scavenger_hunts[${index}][latitude]`, hunt.latitude.toString());
+                        formData.append(`scavenger_hunts[${index}][longitude]`, hunt.longitude.toString());
                         // Only append image if a new one is selected
                         if (hunt.image) {
                               formData.append(`scavenger_hunts[${index}][image]`, hunt.image);
@@ -232,14 +294,30 @@ const UpdateVenue = ({ venueData, onSuccess, onCancel }) => {
 
                   stopsData.forEach((stop, index) => {
                         formData.append(`stops[${index}][name]`, stop.name);
-                        formData.append(`stops[${index}][latitude]`, stop.latitude);
-                        formData.append(`stops[${index}][longitude]`, stop.longitude);
+                        formData.append(`stops[${index}][latitude]`, stop.latitude.toString());
+                        formData.append(`stops[${index}][longitude]`, stop.longitude.toString());
                   });
 
-                  // console.log("FormData contents:");
+                  console.log("FormData contents:");
                   for (let [key, value] of formData.entries()) {
-                        // console.log(key, value);
+                        console.log(key, value);
                   }
+
+                  console.log("About to send request with the following data:");
+                  console.log("- Venue Name:", venueName);
+                  console.log("- Latitude:", latitude);
+                  console.log("- Longitude:", longitude);
+                  console.log("- Description:", description);
+                  console.log("- City ID:", cityId);
+                  console.log("- Place ID:", placeId);
+                  console.log("- Image:", image ? "Yes" : "No");
+                  console.log("- Scavenger Hunts:", huntsData.length);
+                  console.log("- Venue Messages:", messagesData.length);
+                  console.log("- Stops:", stopsData.length);
+
+                  console.log("Scavenger hunts data:", huntsData);
+                  console.log("Venue messages data:", messagesData);
+                  console.log("Stops data:", stopsData);
 
                   // console.log("Scavenger hunts being sent:", huntsData);
                   // console.log("Venue messages being sent:", messagesData);
@@ -254,15 +332,43 @@ const UpdateVenue = ({ venueData, onSuccess, onCancel }) => {
                   if (onSuccess) onSuccess(res.data);
             } catch (err) {
                   console.error("Error updating venue:", err);
-                  console.error("Error response:", err.response?.data || err);
+                  console.error("Error response data:", err.response?.data);
                   console.error("Error status:", err.response?.status);
                   console.error("Error headers:", err.response?.headers);
+                  console.error("Full error object:", err);
 
-                  // Show more specific error message
-                  const errorMessage = err.response?.data?.message ||
-                        err.response?.data?.error ||
-                        JSON.stringify(err.response?.data) ||
-                        "Failed to update venue. Please try again.";
+                  // Try to extract meaningful error message from HTML response
+                  let errorMessage = "Failed to update venue. Please try again.";
+                  
+                  if (err.response?.data && typeof err.response.data === 'string') {
+                        // Try to extract error from HTML response
+                        const htmlResponse = err.response.data;
+                        
+                        // Look for specific error patterns in the HTML
+                        if (htmlResponse.includes('IntegrityError')) {
+                              if (htmlResponse.includes('NOT NULL constraint failed')) {
+                                    const match = htmlResponse.match(/NOT NULL constraint failed: (\w+\.\w+)/);
+                                    if (match) {
+                                          errorMessage = `Database error: Required field '${match[1]}' is missing.`;
+                                    } else {
+                                          errorMessage = "Database error: A required field is missing.";
+                                    }
+                              } else {
+                                    errorMessage = "Database integrity error. Please check your data.";
+                              }
+                        } else if (htmlResponse.includes('ValidationError')) {
+                              errorMessage = "Validation error. Please check your input data.";
+                        } else if (htmlResponse.includes('PermissionDenied')) {
+                              errorMessage = "Permission denied. You don't have access to update venues.";
+                        } else if (htmlResponse.includes('DoesNotExist')) {
+                              errorMessage = "Referenced object does not exist. Please check your city and place selections.";
+                        }
+                  } else if (err.response?.data?.message) {
+                        errorMessage = err.response.data.message;
+                  } else if (err.response?.data?.error) {
+                        errorMessage = err.response.data.error;
+                  }
+
                   alert(`Error: ${errorMessage}`);
             } finally {
                   setLoading(false);
@@ -441,7 +547,6 @@ const UpdateVenue = ({ venueData, onSuccess, onCancel }) => {
                                           </button>
                                     </div>
 
-                                    {/* Latitude and Longitude inputs */}
                                     <div className="grid grid-cols-2 gap-3">
                                           <div className="flex flex-col">
                                                 <label className="mb-1 text-sm font-medium text-gray-600">
@@ -568,6 +673,34 @@ const UpdateVenue = ({ venueData, onSuccess, onCancel }) => {
                                           <p className="text-xs text-gray-500 mt-1">
                                                 {hunt.currentImage ? "Upload new image to replace current one" : "Upload an image for this hunt"}
                                           </p>
+                                    </div>
+                                    
+                                    {/* Latitude and Longitude inputs */}
+                                    <div className="grid grid-cols-2 gap-3">
+                                          <div className="flex flex-col">
+                                                <label className="mb-1 text-sm font-medium text-gray-600">
+                                                      Latitude
+                                                </label>
+                                                <input
+                                                      type="text"
+                                                      className="border border-gray-300 rounded px-3 py-2 text-sm"
+                                                      value={hunt.latitude}
+                                                      onChange={(e) => updateScavengerHunt(index, 'latitude', e.target.value)}
+                                                      placeholder="Enter latitude"
+                                                />
+                                          </div>
+                                          <div className="flex flex-col">
+                                                <label className="mb-1 text-sm font-medium text-gray-600">
+                                                      Longitude
+                                                </label>
+                                                <input
+                                                      type="text"
+                                                      className="border border-gray-300 rounded px-3 py-2 text-sm"
+                                                      value={hunt.longitude}
+                                                      onChange={(e) => updateScavengerHunt(index, 'longitude', e.target.value)}
+                                                      placeholder="Enter longitude"
+                                                />
+                                          </div>
                                     </div>
                               </div>
                         ))}

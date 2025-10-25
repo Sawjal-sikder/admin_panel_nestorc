@@ -62,16 +62,7 @@ const DetailsModal = ({ visible, data, onClose }) => {
                                           data.scavenger_hunts.map((hunt) => (
                                                 <li key={hunt.id}>
                                                       <p>{hunt.title}</p>
-                                                      {/* - Checked: {hunt.check?.checked ? "Yes" : "No"} */}
-                                                      {/* {hunt.check?.uploaded_image && (
-                                                      <div>
-                                                      <img
-                                                      src={`http://10.10.7.76:8000${hunt.check.uploaded_image}`}
-                                                      alt={hunt.title}
-                                                      className="mt-2 w-32 h-32 object-cover border"
-                                                      />
-                                                      </div>
-                                                      )} */}
+                                                      <p>{hunt.latitude} & {hunt.longitude}</p>
                                                 </li>
                                           ))
                                     ) : (
