@@ -11,5 +11,8 @@ export default defineConfig({
   server: {
     host: "0.0.0.0",
     port: 14001,
+    // Allow the external host for development access
+    // Add additional hosts here if needed
+    allowedHosts: ["nestoc.dsrt321.online"],
   },
 });
