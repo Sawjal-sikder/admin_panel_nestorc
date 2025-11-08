@@ -185,9 +185,9 @@ const MainComponent = () => {
         <CreatePremiumTour onSuccess={handleVenueCreated} />
       </Modal>
 
-      {/* Update Venue Modal */}
+      {/* Update Tour Modal */}
       <Modal
-        title="Update Venue"
+        title="Update Tour"
         open={isModalOpenUpdateVenue}
         onCancel={handleUpdateCancel}
         footer={null}
