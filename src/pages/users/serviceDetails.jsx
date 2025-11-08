@@ -43,32 +43,32 @@ const DetailsModal = ({ visible, data, onClose }) => {
                               <p><strong>Longitude:</strong> {data.longitude}</p>
                               <p><strong>City:</strong> {data.city}</p>
                               <p><strong>Type of Place:</strong> {data.type_of_place}</p>
-                              <p><strong>Stops (for free tours):</strong></p>
-                              <ul className="list-disc pl-8">
-                                    {data.stops && data.stops.length > 0 ? (
-                                          data.stops.map((stop) => (
-                                                <li key={stop.id}>
-                                                      <p>{stop.name}</p>
-                                                      <p>{stop.latitude} & {stop.longitude}</p>
-                                                </li>
-                                          ))
-                                    ) : (
-                                          <li>No stops available</li>
-                                    )}
-                              </ul>
-                              <p><strong>Scavenger Hunts (for paid tours):</strong></p>
-                              <ul className="list-disc pl-8">
-                                    {data.scavenger_hunts && data.scavenger_hunts.length > 0 ? (
-                                          data.scavenger_hunts.map((hunt) => (
-                                                <li key={hunt.id}>
-                                                      <p>{hunt.title}</p>
-                                                      <p>{hunt.latitude} & {hunt.longitude}</p>
-                                                </li>
-                                          ))
-                                    ) : (
-                                          <li>No scavenger hunts</li>
-                                    )}
-                              </ul>
+                              {data.stops && data.stops.length > 0 && (
+                                    <>
+                                          <p><strong>Stops:</strong></p>
+                                          <ul className="list-disc pl-8">
+                                                {data.stops.map((stop) => (
+                                                      <li key={stop.id}>
+                                                            <p>{stop.name}</p>
+                                                            <p>{stop.latitude} & {stop.longitude}</p>
+                                                      </li>
+                                                ))}
+                                          </ul>
+                                    </>
+                              )}
+                              {data.scavenger_hunts && data.scavenger_hunts.length > 0 && (
+                                    <>
+                                          <p><strong>Scavenger Hunts :</strong></p>
+                                          <ul className="list-disc pl-8">
+                                                {data.scavenger_hunts.map((hunt) => (
+                                                      <li key={hunt.id}>
+                                                            <p>{hunt.title}</p>
+                                                            <p>{hunt.latitude} & {hunt.longitude}</p>
+                                                      </li>
+                                                ))}
+                                          </ul>
+                                    </>
+                              )}
                               <p><strong>Messages for Venue:</strong></p>
                               <ul className="list-disc pl-8">
                                     {data.venue_message && data.venue_message.length > 0 ? (

@@ -11,8 +11,8 @@ const CreateVenue = ({ onSuccess }) => {
       const [image, setImage] = useState(null);
       const [loading, setLoading] = useState(false);
       const [errors, setErrors] = useState({});
+      const [scavengerHunts, setScavengerHunts] = useState([{ title: "", image: null, latitude: "", longitude: "" }]);
       const [venueMessages, setVenueMessages] = useState([]);
-      const [stops, setStops] = useState([{ name: "", latitude: "", longitude: "" }]);
 
       // Fetch cities and places at the top level
       const { data: cities, loading: citiesLoading } = useFetchData("/services/cities/");
@@ -27,16 +27,16 @@ const CreateVenue = ({ onSuccess }) => {
             if (!city) newErrors.city = true;
             if (!place) newErrors.place = true;
 
-            // Validate stops - all fields are required
-            stops.forEach((stop, index) => {
-                  if (!stop.name.trim()) {
-                        newErrors[`stop_${index}_name`] = true;
+            // Validate scavenger hunts - all fields are required
+            scavengerHunts.forEach((hunt, index) => {
+                  if (!hunt.title.trim()) {
+                        newErrors[`hunt_${index}_title`] = true;
                   }
-                  if (!stop.latitude.trim()) {
-                        newErrors[`stop_${index}_latitude`] = true;
+                  if (!hunt.latitude.trim()) {
+                        newErrors[`hunt_${index}_latitude`] = true;
                   }
-                  if (!stop.longitude.trim()) {
-                        newErrors[`stop_${index}_longitude`] = true;
+                  if (!hunt.longitude.trim()) {
+                        newErrors[`hunt_${index}_longitude`] = true;
                   }
             });
 
@@ -44,6 +44,35 @@ const CreateVenue = ({ onSuccess }) => {
             return Object.keys(newErrors).length === 0;
       };
 
+      const addScavengerHunt = () => {
+            setScavengerHunts([...scavengerHunts, { title: "", image: null, latitude: "", longitude: "" }]);
+      };
+
+      const removeScavengerHunt = (index) => {
+            const updatedHunts = scavengerHunts.filter((_, i) => i !== index);
+            setScavengerHunts(updatedHunts);
+            
+            // Clear errors for removed hunt
+            setErrors(prev => {
+                  const newErrors = { ...prev };
+                  delete newErrors[`hunt_${index}_title`];
+                  delete newErrors[`hunt_${index}_latitude`];
+                  delete newErrors[`hunt_${index}_longitude`];
+                  return newErrors;
+            });
+      };
+
+      const updateScavengerHunt = (index, field, value) => {
+            const updatedHunts = scavengerHunts.map((hunt, i) =>
+                  i === index ? { ...hunt, [field]: value } : hunt
+            );
+            setScavengerHunts(updatedHunts);
+            
+            // Clear error for this field when user types
+            if (errors[`hunt_${index}_${field}`]) {
+                  setErrors(prev => ({ ...prev, [`hunt_${index}_${field}`]: false }));
+            }
+      };
 
       const addVenueMessage = () => {
             setVenueMessages([...venueMessages, { id: Date.now(), message: "" }]);
@@ -59,36 +88,6 @@ const CreateVenue = ({ onSuccess }) => {
                   i === index ? { ...msg, message: value } : msg
             );
             setVenueMessages(updatedMessages);
-      };
-
-      const addStop = () => {
-            setStops([...stops, { name: "", latitude: "", longitude: "" }]);
-      };
-
-      const removeStop = (index) => {
-            const updatedStops = stops.filter((_, i) => i !== index);
-            setStops(updatedStops);
-            
-            // Clear errors for removed stop
-            setErrors(prev => {
-                  const newErrors = { ...prev };
-                  delete newErrors[`stop_${index}_name`];
-                  delete newErrors[`stop_${index}_latitude`];
-                  delete newErrors[`stop_${index}_longitude`];
-                  return newErrors;
-            });
-      };
-
-      const updateStop = (index, field, value) => {
-            const updatedStops = stops.map((stop, i) =>
-                  i === index ? { ...stop, [field]: value } : stop
-            );
-            setStops(updatedStops);
-            
-            // Clear error for this field when user types
-            if (errors[`stop_${index}_${field}`]) {
-                  setErrors(prev => ({ ...prev, [`stop_${index}_${field}`]: false }));
-            }
       };
 
       const handleSubmit = async (e) => {
@@ -149,6 +148,31 @@ const CreateVenue = ({ onSuccess }) => {
                         return;
                   }
 
+                  // Check for incomplete scavenger hunts and warn user
+                  const incompleteHunts = scavengerHunts.filter(hunt => {
+                        if (!hunt.title || !hunt.title.trim()) return false; // Empty hunts are fine to ignore
+                        if (!hunt.latitude || !hunt.latitude.trim()) return true;
+                        if (!hunt.longitude || !hunt.longitude.trim()) return true;
+                        
+                        const lat = parseFloat(hunt.latitude.trim());
+                        const lng = parseFloat(hunt.longitude.trim());
+                        
+                        if (isNaN(lat) || isNaN(lng)) return true;
+                        if (lat < -90 || lat > 90) return true;
+                        if (lng < -180 || lng > 180) return true;
+                        
+                        return false;
+                  });
+
+                  if (incompleteHunts.length > 0) {
+                        const shouldContinue = confirm(
+                              `Warning: ${incompleteHunts.length} scavenger hunt(s) have missing or invalid latitude/longitude coordinates and will not be saved. Do you want to continue?`
+                        );
+                        if (!shouldContinue) {
+                              setLoading(false);
+                              return;
+                        }
+                  }
 
                   const formData = new FormData();
                   formData.append("venue_name", venueName);
@@ -162,35 +186,56 @@ const CreateVenue = ({ onSuccess }) => {
                         formData.append("image", image);
                   }
 
+                  // Prepare scavenger_hunts and venue_message arrays in the exact format the API expects
+                  const huntsData = scavengerHunts
+                        .filter(hunt => {
+                              if (!hunt.title || !hunt.title.trim()) return false;
+                              if (!hunt.latitude || !hunt.latitude.trim()) return false;
+                              if (!hunt.longitude || !hunt.longitude.trim()) return false;
+                              
+                              const lat = parseFloat(hunt.latitude.trim());
+                              const lng = parseFloat(hunt.longitude.trim());
+                              
+                              // Validate latitude and longitude ranges
+                              if (isNaN(lat) || isNaN(lng)) return false;
+                              if (lat < -90 || lat > 90) return false;
+                              if (lng < -180 || lng > 180) return false;
+                              
+                              return true;
+                        })
+                        .map(hunt => ({ 
+                              title: hunt.title.trim(), 
+                              image: hunt.image, 
+                              latitude: parseFloat(hunt.latitude.trim()), 
+                              longitude: parseFloat(hunt.longitude.trim()) 
+                        }));
 
                   const messagesData = venueMessages
                         .filter(msg => msg.message && msg.message.trim())
                         .map(msg => ({ message: msg.message.trim() }));
 
-                  // Add stops data to FormData
-                  const stopsData = stops
-                        .filter(stop => stop.name && stop.name.trim() && stop.latitude && stop.longitude)
-                        .map(stop => ({
-                              name: stop.name.trim(),
-                              latitude: parseFloat(stop.latitude),
-                              longitude: parseFloat(stop.longitude)
-                        }));
+
+                  // Add scavenger hunts with optional images to FormData
+                  huntsData.forEach((hunt, index) => {
+                        formData.append(`scavenger_hunts[${index}][title]`, hunt.title);
+                        formData.append(`scavenger_hunts[${index}][latitude]`, hunt.latitude.toString());
+                        formData.append(`scavenger_hunts[${index}][longitude]`, hunt.longitude.toString());
+                        // Only append image if it exists
+                        if (hunt.image) {
+                              formData.append(`scavenger_hunts[${index}][image]`, hunt.image);
+                        }
+                  });
 
                   messagesData.forEach((message, index) => {
                         formData.append(`venue_message[${index}][message]`, message.message);
                   });
 
-                  // Add stops data to FormData
-                  stopsData.forEach((stop, index) => {
-                        formData.append(`stops[${index}][name]`, stop.name);
-                        formData.append(`stops[${index}][latitude]`, stop.latitude.toString());
-                        formData.append(`stops[${index}][longitude]`, stop.longitude.toString());
-                  });
 
                   console.log("FormData contents:");
                   for (let [key, value] of formData.entries()) {
                         console.log(key, value);
                   }
+
 
 
                   const res = await API.post("/services/venues/create/", formData, {
@@ -206,13 +251,11 @@ const CreateVenue = ({ onSuccess }) => {
                   setCity("");
                   setPlace("");
                   setImage(null);
+                  setScavengerHunts([{ title: "", image: null, latitude: "", longitude: "" }]);
                   setVenueMessages([]);
-                  setStops([{ name: "", latitude: "", longitude: "" }]);
                   setErrors({});
 
-                  if (onSuccess) {
-                        onSuccess(res.data);
-                  }
+                  if (onSuccess) onSuccess(res.data);
             } catch (err) {
                   console.error("Error creating venue:", err);
                   console.error("Error response data:", err.response?.data);
@@ -385,43 +428,75 @@ const CreateVenue = ({ onSuccess }) => {
                               <span className="text-red-500 text-sm mt-1">Place selection is required</span>
                         )}
                   </div>
-                  {/* Stops Section */}
+
+
+                  {/* Scavenger Hunts Section */}
                   <div className="flex flex-col">
                         <div className="flex justify-between items-center mb-3">
-                              <label className="font-medium">Stops</label>
+                              <label className="font-medium">Scavenger Hunts</label>
                               <button
                                     type="button"
-                                    onClick={addStop}
+                                    onClick={addScavengerHunt}
                                     className="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700"
                               >
-                                    Add Stop
+                                    Add Scavenger Hunt
                               </button>
                         </div>
 
-                        {stops.map((stop, index) => (
+                        {scavengerHunts.map((hunt, index) => (
                               <div key={index} className="border border-gray-200 rounded p-4 mb-4">
                                     <div className="flex flex-col mb-3">
                                           <div className="flex items-center">
                                                 <input
                                                       type="text"
-                                                      className={`border rounded px-3 py-2 flex-1 ${errors[`stop_${index}_name`]
+                                                      className={`border rounded px-3 py-2 flex-1 ${errors[`hunt_${index}_title`]
                                                             ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
                                                             : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'
                                                             }`}
-                                                      value={stop.name}
-                                                      onChange={(e) => updateStop(index, 'name', e.target.value)}
-                                                      placeholder="Enter stop name"
+                                                      value={hunt.title}
+                                                      onChange={(e) => updateScavengerHunt(index, 'title', e.target.value)}
+                                                      placeholder="Enter scavenger hunt title"
                                                 />
                                                 <button
                                                       type="button"
-                                                      onClick={() => removeStop(index)}
+                                                      onClick={() => removeScavengerHunt(index)}
                                                       className="ml-2 bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600"
                                                 >
                                                       Remove
                                                 </button>
                                           </div>
-                                          {errors[`stop_${index}_name`] && (
-                                                <span className="text-red-500 text-sm mt-1">Stop name is required</span>
+                                          {errors[`hunt_${index}_title`] && (
+                                                <span className="text-red-500 text-sm mt-1">Title is required</span>
+                                          )}
+                                    </div>
+
+                                    {/* Image upload for this scavenger hunt */}
+                                    <div className="flex flex-col mb-3">
+                                          <label className="mb-1 text-sm font-medium text-gray-600">
+                                                Upload Image (Optional)
+                                          </label>
+                                          <input
+                                                type="file"
+                                                accept="image/*"
+                                                className="border border-gray-300 rounded px-3 py-2 text-sm"
+                                                onChange={(e) => updateScavengerHunt(index, 'image', e.target.files[0])}
+                                          />
+                                          {hunt.image && (
+                                                <div className="mt-2 relative">
+                                                      <img
+                                                            src={URL.createObjectURL(hunt.image)}
+                                                            alt="Scavenger hunt preview"
+                                                            className="h-20 w-auto border rounded"
+                                                      />
+                                                      <button
+                                                            type="button"
+                                                            onClick={() => updateScavengerHunt(index, 'image', null)}
+                                                            className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600"
+                                                            style={{ transform: 'translate(50%, -50%)' }}
+                                                      >
+                                                            ×
+                                                      </button>
+                                                </div>
                                           )}
                                     </div>
 
@@ -433,15 +508,15 @@ const CreateVenue = ({ onSuccess }) => {
                                                 </label>
                                                 <input
                                                       type="text"
-                                                      className={`border rounded px-3 py-2 text-sm ${errors[`stop_${index}_latitude`]
+                                                      className={`border rounded px-3 py-2 text-sm ${errors[`hunt_${index}_latitude`]
                                                             ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
                                                             : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'
                                                             }`}
-                                                      value={stop.latitude}
-                                                      onChange={(e) => updateStop(index, 'latitude', e.target.value)}
+                                                      value={hunt.latitude}
+                                                      onChange={(e) => updateScavengerHunt(index, 'latitude', e.target.value)}
                                                       placeholder="Enter latitude"
                                                 />
-                                                {errors[`stop_${index}_latitude`] && (
+                                                {errors[`hunt_${index}_latitude`] && (
                                                       <span className="text-red-500 text-sm mt-1">Latitude is required</span>
                                                 )}
                                           </div>
@@ -451,15 +526,15 @@ const CreateVenue = ({ onSuccess }) => {
                                                 </label>
                                                 <input
                                                       type="text"
-                                                      className={`border rounded px-3 py-2 text-sm ${errors[`stop_${index}_longitude`]
+                                                      className={`border rounded px-3 py-2 text-sm ${errors[`hunt_${index}_longitude`]
                                                             ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
                                                             : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'
                                                             }`}
-                                                      value={stop.longitude}
-                                                      onChange={(e) => updateStop(index, 'longitude', e.target.value)}
+                                                      value={hunt.longitude}
+                                                      onChange={(e) => updateScavengerHunt(index, 'longitude', e.target.value)}
                                                       placeholder="Enter longitude"
                                                 />
-                                                {errors[`stop_${index}_longitude`] && (
+                                                {errors[`hunt_${index}_longitude`] && (
                                                       <span className="text-red-500 text-sm mt-1">Longitude is required</span>
                                                 )}
                                           </div>
@@ -467,8 +542,6 @@ const CreateVenue = ({ onSuccess }) => {
                               </div>
                         ))}
                   </div>
-
-
 
                   {/* Venue Messages Section */}
                   <div className="flex flex-col">

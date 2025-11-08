@@ -115,7 +115,7 @@ const Venues = () => {
           className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
           onClick={() => setCreateVenueModal(true)}
         >
-          Create Venue
+          Create free Tour
         </button>
       </div>
 
@@ -128,7 +128,7 @@ const Venues = () => {
         onClose={() => setCreateVenueModal(false)}
         onSuccess={handleCreated}
         endpoint="/services/venues/create/"
-        title="Create Venue"
+        title="Create free Tour"
         fields={[
           { name: "venue_name", label: "Venue Name", type: "text", placeholder: "Enter venue name", required: true },
           { name: "latitude", label: "Latitude", type: "text", placeholder: "Enter latitude", required: true },

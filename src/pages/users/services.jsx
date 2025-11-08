@@ -6,6 +6,7 @@ import DetailsModal from "./serviceDetails";
 import CreateVenue from "./serviceeHook/createVenue";
 import UpdateVenue from "./serviceeHook/updateVenue";
 import useDelete from "../../hook/delete";
+import CreatePremiumTour from "./serviceeHook/CreatePremium";
 
 const MainComponent = () => {
   const { data: initialData, loading, error, refetch } = servicedataHook();
@@ -14,6 +15,8 @@ const MainComponent = () => {
   const [data, setData] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalOpenCreateVenue, setIsModalOpenCreateVenue] = useState(false);
+  const [isModalOpenCreateFreeTour, setIsModalOpenCreateFreeTour] = useState(false);
+  const [isModalOpenCreatePremiumTour, setIsModalOpenCreatePremiumTour] = useState(false);
   const [isModalOpenUpdateVenue, setIsModalOpenUpdateVenue] = useState(false);
   const [isModalOpenEdit, setIsModalOpenEdit] = useState(false);
   const [selectedData, setSelectedData] = useState(null);
@@ -52,8 +55,12 @@ const MainComponent = () => {
     }
   };
 
-  const handleCreate = () => {
-    setIsModalOpenCreateVenue(true);
+  const handleCreateFreeTour = () => {
+    setIsModalOpenCreateFreeTour(true);
+  };
+
+  const handleCreatePremiumTour = () => {
+    setIsModalOpenCreatePremiumTour(true);
   };
 
   // State to trigger refetch after venue creation
@@ -118,12 +125,20 @@ const MainComponent = () => {
 
   return (
     <>
-      <div className="flex justify-end mb-4">
+      <div className="flex justify-end mb-4 gap-x-5">
         <button
-          onClick={handleCreate}
+          onClick={handleCreateFreeTour}
           className="bg-blue-600 text-white border-none px-4 py-2 rounded cursor-pointer font-medium shadow"
         >
-          Create Venue
+          Create Free Tour
+        </button>
+      {/* </div>
+      <div className="flex justify-end mb-4"> */}
+        <button
+          onClick={handleCreatePremiumTour}
+          className="bg-blue-600 text-white border-none px-4 py-2 rounded cursor-pointer font-medium shadow"
+        >
+          Create Premium Tour
         </button>
       </div>
 
@@ -142,18 +157,32 @@ const MainComponent = () => {
         onClose={() => setIsModalOpen(false)}
       />
 
-      {/* Create Venue Modal */}
+      {/* Create Free Tour Modal */}
       <Modal
-        title="Create Venue"
-        open={isModalOpenCreateVenue}
-        onCancel={() => setIsModalOpenCreateVenue(false)}
+        title="Create Free Tour"
+        open={isModalOpenCreateFreeTour}
+        onCancel={() => setIsModalOpenCreateFreeTour(false)}
+        footer={null}
+        destroyOnHidden={true}
+        width={800}
+        centered
+        className="px-10"  
+      >
+        <CreateVenue onSuccess={handleVenueCreated} />
+      </Modal>
+
+      {/* Create Premium Tour Modal */}
+      <Modal
+        title="Create Premium Tour"
+        open={isModalOpenCreatePremiumTour}
+        onCancel={() => setIsModalOpenCreatePremiumTour(false)}
         footer={null}
         destroyOnHidden={true}
         width={800}
         centered
         className="px-10"  // Add horizontal padding to the modal
       >
-        <CreateVenue onSuccess={handleVenueCreated} />
+        <CreatePremiumTour onSuccess={handleVenueCreated} />
       </Modal>
 
       {/* Update Venue Modal */}
