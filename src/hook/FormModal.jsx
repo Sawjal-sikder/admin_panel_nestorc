@@ -73,14 +73,28 @@ const FormModal = ({
       const handleSubmit = async (e) => {
             e.preventDefault();
             try {
-                  // Filter out null/undefined file fields if no file is selected
+                  // Filter out file fields properly based on mode and file state
                   const cleanedData = Object.keys(formData).reduce((acc, key) => {
                         const field = fields.find(f => f.name === key);
-                        // Skip null/undefined file fields
-                        if (field?.type === "file" && (formData[key] === null || formData[key] === undefined)) {
-                              return acc;
+                        
+                        if (field?.type === "file") {
+                              // For create mode: include only if file is selected
+                              if (mode === "create") {
+                                    if (formData[key] instanceof File) {
+                                          acc[key] = formData[key];
+                                    }
+                                    // Skip null/undefined/string values for create
+                              } else {
+                                    // For update mode: include only if new file is selected
+                                    if (formData[key] instanceof File) {
+                                          acc[key] = formData[key];
+                                    }
+                                    // Skip existing URLs or null values for update
+                              }
+                        } else {
+                              // Include non-file fields
+                              acc[key] = formData[key];
                         }
-                        acc[key] = formData[key];
                         return acc;
                   }, {});
 
@@ -215,15 +229,24 @@ const FormModal = ({
 
                                                                         /* File */
                                                                         : field.type === "file" ? (
-                                                                              <input
-                                                                                    type="file"
-                                                                                    name={field.name}
-                                                                                    onChange={(e) =>
-                                                                                          setFormData({ ...formData, [field.name]: e.target.files[0] })
-                                                                                    }
-                                                                                    className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none"
-                                                                                    required={field.required}
-                                                                              />
+                                                                              <div>
+                                                                                    <input
+                                                                                          type="file"
+                                                                                          name={field.name}
+                                                                                          onChange={(e) => {
+                                                                                                // Set the file or null if no file selected
+                                                                                                const file = e.target.files[0] || null;
+                                                                                                setFormData({ ...formData, [field.name]: file });
+                                                                                          }}
+                                                                                          className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none"
+                                                                                          required={field.required && mode === "create"}
+                                                                                    />
+                                                                                    {mode === "update" && data?.[field.name] && typeof data[field.name] === "string" && (
+                                                                                          <p className="text-sm text-gray-500 mt-1">
+                                                                                                Current: {data[field.name].split('/').pop()}
+                                                                                          </p>
+                                                                                    )}
+                                                                              </div>
                                                                         )
 
                                                                               /* Default text/number/email */
