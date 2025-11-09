@@ -12,7 +12,21 @@ const useUpdate = (initialData = null) => {
             setError(null);
 
             try {
-                  const response = await API.put(url, payload);
+                  let dataToSend = payload;
+                  let headers = {};
+
+                  if (Object.values(payload).some((v) => v instanceof File || v instanceof Blob)) {
+                        const formData = new FormData();
+                        for (const key in payload) {
+                              formData.append(key, payload[key]);
+                        }
+                        dataToSend = formData;
+                        // Don't set Content-Type for FormData - let Axios set it with boundary
+                  } else {
+                        headers["Content-Type"] = "application/json";
+                  }
+
+                  const response = await API.put(url, dataToSend, { headers });
                   setData(response.data);
                   setLoading(false);
                   return response.data;

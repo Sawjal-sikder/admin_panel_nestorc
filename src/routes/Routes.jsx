@@ -8,7 +8,7 @@ import NotFound from "../pages/NotFound";
 const baseUrl = import.meta.env.BASE_URL;
 import Profile from "../pages/profile/Profile";
 import UsersPage from "../pages/users/Users";
-import Venues from "../pages/venues/Venues";
+import Nearby from "../pages/nearby/Nearby";
 import Service from "../pages/users/services";
 import City from "../pages/city/City";
 import GeoFences from "../pages/geofences/GeoFences";
@@ -53,6 +53,10 @@ export const router = createBrowserRouter(
         {
           path: "geo-fences",
           element: <GeoFences />,
+        },
+        {
+          path: "nearby",
+          element: <Nearby />,
         },
         {
           path: "privacy-policy",

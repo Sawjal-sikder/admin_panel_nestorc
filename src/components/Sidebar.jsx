@@ -34,6 +34,7 @@ const Sidebar = ({ onClick }) => {
     if (path === "/profile") return ["settings", "setting-profile"];
     if (path === "/city") return ["settings", "city"];
     if (path === "/geo-fences") return ["settings", "geo-fences"];
+    if (path === "/nearby") return ["settings", "nearby"];
     if (path === "/privacy-policy") return ["settings", "privacy-policy"];
     return ["dashboard"];
   };
@@ -63,6 +64,11 @@ const Sidebar = ({ onClick }) => {
       key: "geo-fences",
       icon: <TbPackages />,
       label: <Link to="/geo-fences">Geo Fences</Link>,
+    },
+    {
+      key: "nearby",
+      icon: <TbPackages />,
+      label: <Link to="/nearby">Nearby Attractions</Link>,
     },
     // {
     //   key: "settings",

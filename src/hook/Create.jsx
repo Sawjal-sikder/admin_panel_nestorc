@@ -21,7 +21,8 @@ const useApiMutation = (url, method = "post", config = {}) => {
                               formData.append(key, payload[key]);
                         }
                         dataToSend = formData;
-                        headers["Content-Type"] = "multipart/form-data";
+                        // Don't set Content-Type for FormData - let Axios set it with boundary
+                        delete headers["Content-Type"];
                   } else {
                         headers["Content-Type"] = "application/json";
                   }

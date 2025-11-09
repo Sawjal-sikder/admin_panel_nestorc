@@ -33,6 +33,9 @@ const FormModal = ({
                               ) || [{}];
                         } else if (field.type === "boolean") {
                               acc[field.name] = data?.[field.name] ?? false;
+                        } else if (field.type === "file") {
+                              // Don't initialize file fields with empty string
+                              acc[field.name] = data?.[field.name] ?? null;
                         } else {
                               acc[field.name] = data?.[field.name] ?? "";
                         }
@@ -70,11 +73,22 @@ const FormModal = ({
       const handleSubmit = async (e) => {
             e.preventDefault();
             try {
+                  // Filter out null/undefined file fields if no file is selected
+                  const cleanedData = Object.keys(formData).reduce((acc, key) => {
+                        const field = fields.find(f => f.name === key);
+                        // Skip null/undefined file fields
+                        if (field?.type === "file" && (formData[key] === null || formData[key] === undefined)) {
+                              return acc;
+                        }
+                        acc[key] = formData[key];
+                        return acc;
+                  }, {});
+
                   let result;
                   if (mode === "create") {
-                        result = await createData(formData);
+                        result = await createData(cleanedData);
                   } else {
-                        result = await updateData(endpoint, formData);
+                        result = await updateData(endpoint, cleanedData);
                   }
                   if (onSuccess) onSuccess(result);
                   onClose();
