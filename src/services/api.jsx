@@ -1,10 +1,9 @@
 import axios from "axios";
 
 const API = axios.create({
-      baseURL: "https://nestocbackend.dsrt321.online/api",
-      // baseURL: "http://10.10.7.76:8000/api",
+      baseURL: "https://nestorcapi.boltscootersllc.com/api",
+      // baseURL: "http://10.10.7.76:14000/api",
       // baseURL: "http://103.186.20.115:14000/api",
-      headers: { "Content-Type": "application/json" },
 });
 
 // Attach JWT token automatically
