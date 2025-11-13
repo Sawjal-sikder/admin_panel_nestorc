@@ -9,13 +9,13 @@ const ReusableTable = ({ columns, data, actions }) => {
                                     {columns.map((col, idx) => (
                                           <th
                                                 key={idx}
-                                                className="px-4 py-5 text-center font-semibold text-gray-700"
+                                                className="px-4 py-5 text-left font-semibold text-gray-700"
                                           >
                                                 {col.header}
                                           </th>
                                     ))}
                                     {actions && (
-                                          <th className="px-4 py-5 font-semibold text-gray-700">Action</th>
+                                          <th className="px-4 py-5 text-left font-semibold text-gray-700">Action</th>
                                     )}
                               </tr>
                         </thead>
@@ -31,7 +31,7 @@ const ReusableTable = ({ columns, data, actions }) => {
                                                 </td>
                                           ))}
                                           {actions && (
-                                                <td className="px-4 py-5 flex gap-5 justify-center">
+                                                <td className="px-4 py-5 flex gap-5 justify-left">
                                                       {actions.map((action, i) => (
                                                             <button
                                                                   key={i}

@@ -59,7 +59,7 @@ const Nearby = () => {
     {
       header: "SL No",
       render: (row, index) => (
-        <p className="text-center font-semibold text-gray-700">
+        <p className="text-left font-semibold text-gray-700">
           {index + 1}
         </p>
       ),
